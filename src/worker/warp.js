@@ -8,7 +8,6 @@ const randomString = () => String(Math.random())
 
 export const apply = worker => {
   if (!warpWorker) {
-    console.log('apply', worker)
     warpWorker = worker
     worker.addEventListener('message', ({ data: { key, data } }) => {
       resolveMap.get(key)(data)
@@ -34,5 +33,7 @@ export const warp = f => {
         warpWorker.postMessage({ fNum, params, key })
       }
     })
+  } else {
+    return f
   }
 }

@@ -1,16 +1,5 @@
 <template>
 <div id="app">
+  <router-view></router-view>
 </div>
 </template>
-
-<script>
-import { loadFs, getFs } from '@/worker'
-
-export default {
-  async mounted() {
-    await loadFs()
-    console.log('fs loaded')
-    console.log(await getFs())
-  }
-}
-</script>
