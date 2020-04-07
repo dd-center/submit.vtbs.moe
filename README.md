@@ -1,5 +1,7 @@
 # submit.vtbs.moe
 
+![github pages](https://github.com/dd-center/submit.vtbs.moe/workflows/github%20pages/badge.svg?branch=master)
+
 ## Project setup
 ```
 npm install
@@ -22,3 +24,4 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
