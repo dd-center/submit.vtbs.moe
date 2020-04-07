@@ -1,13 +1,14 @@
 <template>
 <div class="container">
-  <list v-if="fsLoaded"></list>
+  <br>
+  <diff v-if="fsLoaded"></diff>
 </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
 
-import list from '@/components/list'
+import diff from '@/components/diff'
 
 export default {
   async mounted() {
@@ -15,7 +16,7 @@ export default {
       await this.loadFs()
     }
   },
-  components: { list },
+  components: { diff },
   computed: mapState(['fsLoaded']),
   methods: mapActions(['loadFs'])
 }

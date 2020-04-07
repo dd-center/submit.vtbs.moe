@@ -1,12 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import Submit from '../views/Submit.vue'
 
 Vue.use(VueRouter)
 
 const routes = [{
   path: '/',
   component: Home
+}, {
+  path: '/submit',
+  component: Submit
 }]
 
 const router = new VueRouter({

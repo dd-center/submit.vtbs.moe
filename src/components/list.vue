@@ -79,7 +79,7 @@ export default {
 
 <style scoped>
 .index {
-  height: calc(100vh - 145px);
+  height: calc(100vh - 50px);
   overflow-y: auto;
   overflow-x: hidden;
 }

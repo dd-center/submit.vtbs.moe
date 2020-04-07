@@ -1,6 +1,30 @@
 <template>
 <div id="app">
-  <router-view></router-view>
+  <div>
+    <section class="hero is-success is-fullheight">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            submit.vtbs.moe
+          </h1>
+          <h2 class="subtitle">
+            你好呀
+          </h2>
+        </div>
+      </div>
+      <div class="hero-foot">
+        <nav class="tabs">
+          <div class="container">
+            <ul>
+              <router-link tag="li" to="/" class="link"><a class="aLink">Panel</a></router-link>
+              <router-link tag="li" to="/submit" class="link"><a class="aLink">Submit!</a></router-link>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </section>
+    <router-view></router-view>
+  </div>
   <transition-group name="worker-list">
     <span class="tag is-rounded running" v-for="([key, run], i) in running" :key="`worker_${key}`" :style="{ bottom: i * 30 + 'px' }">{{run}}</span>
   </transition-group>
@@ -37,5 +61,22 @@ export default {
 .worker-list-leave-to {
   opacity: 0;
   transform: translateY(40px);
+}
+
+.link {
+  border-color: rgba(0, 0, 0, 0);
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  margin-bottom: 4px;
+}
+
+.router-link-exact-active {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.aLink {
+  padding: 8px 16px 8px 16px;
+  border: 0;
 }
 </style>
