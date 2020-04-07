@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "bulma": "^0.8.1",
+    "bulma-divider": "^0.2.0",
     "core-js": "^3.6.4",
     "vue": "^2.6.11",
     "vue-router": "^3.1.6",
