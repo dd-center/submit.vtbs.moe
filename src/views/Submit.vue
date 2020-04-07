@@ -1,7 +1,14 @@
 <template>
 <div class="container">
   <br>
-  <diff v-if="fsLoaded"></diff>
+  <template v-if="fsLoaded">
+    <diff></diff>
+    <hr>
+    <serialize></serialize>
+    <hr>
+    <issue></issue>
+    <br>
+  </template>
 </div>
 </template>
 
@@ -9,6 +16,8 @@
 import { mapState, mapActions } from 'vuex'
 
 import diff from '@/components/diff'
+import serialize from '@/components/diff/serialize'
+import issue from '@/components/diff/issue'
 
 export default {
   async mounted() {
@@ -16,7 +25,7 @@ export default {
       await this.loadFs()
     }
   },
-  components: { diff },
+  components: { diff, serialize, issue },
   computed: mapState(['fsLoaded']),
   methods: mapActions(['loadFs'])
 }
