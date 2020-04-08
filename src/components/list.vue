@@ -1,7 +1,7 @@
 <template>
 <div class="index" ref="container">
   <div class="indexContainer" :style="{ height: fileList.length * height + 'px' }">
-    <vtb v-for="({i=0, file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file"></vtb>
+    <vtb v-for="({i=0, file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file" :n="n"></vtb>
   </div>
 </div>
 </template>
@@ -9,7 +9,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 
-import vtb, { height } from './list/vtb'
+import vtb, { height, eventEmitter } from './list/vtb'
 
 const RENDER_LENGTH = 100 * 2
 
@@ -26,8 +26,10 @@ export default {
   async mounted() {
     await this.loadFileList()
     this.observer = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
-      const i = Number(target.getAttribute('i'))
       if (isIntersecting) {
+        const i = Number(target.getAttribute('i'))
+        const n = target.getAttribute('n')
+        eventEmitter.emit(n)
         this.lastIntersect = i
       }
     }), { root: this.$refs.container, thresholds: [0] })
@@ -49,8 +51,11 @@ export default {
     ...mapActions(['loadFileList'])
   },
   watch: {
-    fileList() {
+    async fileList() {
       this.render(this.renderTop, RENDER_LENGTH)
+      const top = Math.max(0, this.lastIntersect)
+      await this.$nextTick()
+      Array(10).fill().map((_, i) => i + top - 5).map(String).forEach(n => eventEmitter.emit(n))
     },
     renderTop(newVal, oldVal) {
       if (newVal > oldVal) {

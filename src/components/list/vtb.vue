@@ -1,5 +1,5 @@
 <template>
-<div class="vtb" :style="{ top: i * height + 'px' }" :i="i">
+<div class="vtb" :style="{ top: i * height + 'px' }" :i="i" :n="n">
   <br>
   <hr>
   <div class="columns is-mobile">
@@ -22,16 +22,30 @@
 </template>
 
 <script>
+import EventEmitter from 'events'
 import { mapActions } from 'vuex'
 
 import { getVtbJson, deleteVtb } from '@/worker'
 
-const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
-
 export const height = 110
 
+export const eventEmitter = new EventEmitter()
+
+const onceCache = new Map()
+
+const once = n => {
+  if (!onceCache.has(n)) {
+    const wait = new Promise(resolve => eventEmitter.once(n, resolve))
+    onceCache.set(n, wait)
+    wait.then(() => {
+      onceCache.delete(n)
+    })
+  }
+  return onceCache.get(n)
+}
+
 export default {
-  props: ['i', 'file'],
+  props: ['i', 'file', 'n'],
   data() {
     return {
       height,
@@ -66,7 +80,7 @@ export default {
         if (newFile !== this.currentFile) {
           this.json = {}
         }
-        await wait(Math.random() * 2333)
+        await once(String(this.n))
         if (newFile === this.file) {
           if (newFile && newFile !== oldFile) {
             const json = await getVtbJson(newFile)
