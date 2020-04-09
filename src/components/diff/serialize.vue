@@ -3,7 +3,7 @@
   <h1 class="title">序列化</h1>
   <h2 class="subtitle">Serialize</h2>
   <div class="table-container">
-    <table class="table is-striped is-hoverable">
+    <table class="table is-striped is-hoverable is-fullwidth">
       <thead>
         <tr>
           <th>Command</th>

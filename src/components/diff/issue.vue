@@ -4,7 +4,11 @@
   <h2 class="subtitle">Issue</h2>
   <template v-if="diffLength && diffLength > 0">
     <textarea class="textarea" placeholder="附加信息" v-model="input"></textarea>
+    <br>
     <code>{{issue}}</code>
+    <hr>
+    <button class="button is-link is-light" :class="{ 'is-loading': urlLoading }" @click="submit" v-if="!url">发布</button>
+    <a :href="url" target="_blank" v-if="url">{{url}}</a>
   </template>
   <span v-if="diffLength === undefined">
     loading...
@@ -16,14 +20,16 @@
 </template>
 
 <script>
-import { diff, makeIssue } from '@/worker'
+import { diff, makeIssue, submitDiff } from '@/worker'
 
 export default {
   data() {
     return {
       diffLength: undefined,
       input: '',
-      issue: ''
+      issue: '',
+      url: undefined,
+      urlLoading: false
     }
   },
   async mounted() {
@@ -38,6 +44,12 @@ export default {
           this.issue = issue
         }
       }
+    }
+  },
+  methods: {
+    async submit() {
+      this.urlLoading = true
+      this.url = await submitDiff(this.input)
     }
   }
 }

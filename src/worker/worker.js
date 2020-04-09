@@ -73,5 +73,20 @@ ${description}
 -----BEGIN SUBMIT BLOCK-----${command}-----END SUBMIT BLOCK-----
 \`\`\`
 
-Submit from submit.vtbs.moe`
+Submit from submit.vtbs.moe, please evaluate the automatic Pull Request`
+})
+
+export const submitDiff = warp(async input => {
+  const body = makeIssue(input)
+
+  const response = await fetch('https://api.github.com/repos/dd-center/vdb/issues', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Basic ZGQtY2VudGVyLWJvdDpkZDBiMmY0MjE4OThmNjAzZGYwNGM0NzdkMzQyNmU5MzE4MWRlZTUy'
+    },
+    body: JSON.stringify({ title: 'Change requested from submit.vtbs.moe', body })
+  })
+  const { html_url: url } = await response.json()
+  return url
 })
