@@ -1,22 +1,13 @@
 <template>
 <div class="container">
-  <list v-if="fsLoaded"></list>
+  <list></list>
 </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-
 import list from '@/components/list'
 
 export default {
-  async mounted() {
-    if (!this.fsLoaded) {
-      await this.loadFs()
-    }
-  },
-  components: { list },
-  computed: mapState(['fsLoaded']),
-  methods: mapActions(['loadFs'])
+  components: { list }
 }
 </script>

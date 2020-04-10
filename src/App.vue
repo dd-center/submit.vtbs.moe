@@ -13,7 +13,7 @@
         </div>
       </div>
       <div class="hero-foot">
-        <nav class="tabs">
+        <nav class="tabs" v-if="fsLoaded">
           <div class="container">
             <ul>
               <router-link tag="li" to="/" class="link"><a class="aLink">Panel</a></router-link>
@@ -21,9 +21,12 @@
             </ul>
           </div>
         </nav>
+        <div v-else class="container">
+          Loading...
+        </div>
       </div>
     </section>
-    <router-view></router-view>
+    <router-view v-if="fsLoaded"></router-view>
   </div>
   <transition-group name="worker-list">
     <span class="tag is-rounded running" v-for="([key, run], i) in running" :key="`worker_${key}`" :style="{ bottom: i * 30 + 'px' }">{{run}}</span>
@@ -32,6 +35,8 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+
 import { eventEmitter } from '@/worker/warp'
 
 export default {
@@ -42,7 +47,12 @@ export default {
     eventEmitter.on('running', list => {
       this.running = list
     })
-  }
+    if (!this.fsLoaded) {
+      this.loadFs()
+    }
+  },
+  computed: mapState(['fsLoaded']),
+  methods: mapActions(['loadFs'])
 }
 </script>
 
