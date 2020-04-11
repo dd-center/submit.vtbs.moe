@@ -1,5 +1,5 @@
 <template>
-<div class="vtb" :style="{ top: i * height + 'px' }" :i="i" :n="n">
+<div class="vtb" :style="{ top: i * height + 'px' }" :n="n">
   <br>
   <hr>
   <div class="columns is-mobile">

@@ -1,7 +1,8 @@
 <template>
 <div class="index" ref="container">
-  <div class="indexContainer" :style="{ height: fileList.length * height + 'px' }">
-    <vtb v-for="({i=0, file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file" :n="n"></vtb>
+  <div class="indexContainer" :style="{ height: totalHeight+ 'px' }">
+    <vtb v-for="({i=0,file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file" :n="n"></vtb>
+    <div class="detectors" v-for="({height,top,i},n) in detectors" :key="`detector_${n}`" :i="i" :style="{ height:`${height}px`, top:`${top}px` }"></div>
   </div>
 </div>
 </template>
@@ -11,7 +12,7 @@ import { mapState, mapActions } from 'vuex'
 
 import vtb, { height, eventEmitter } from './list/vtb'
 
-const RENDER_LENGTH = 100 * 2
+const RENDER_LENGTH = 150
 
 export default {
   data() {
@@ -20,65 +21,87 @@ export default {
       renderTop: 0,
       lastIntersect: 0,
       renderedList: Array(RENDER_LENGTH).fill({}),
-      observer: undefined
+      observer: undefined,
+      intersectionObserver: undefined
     }
   },
   async mounted() {
     await this.loadFileList()
     this.observer = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
       if (isIntersecting) {
-        const i = Number(target.getAttribute('i'))
         const n = target.getAttribute('n')
         eventEmitter.emit(n)
+      }
+    }), { root: this.$refs.container, thresholds: [0] })
+    this.intersectionObserver = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
+      if (isIntersecting) {
+        const i = Number(target.getAttribute('i'))
         this.lastIntersect = i
       }
     }), { root: this.$refs.container, thresholds: [0] })
     await this.$nextTick()
     const vtbs = document.getElementsByClassName('vtb')
-    Array(vtbs.length).fill().map((_, i) => vtbs[i]).map(vtb => this.observer.observe(vtb))
+    Array(vtbs.length).fill().map((_, i) => vtbs[i]).forEach(vtb => this.observer.observe(vtb))
+    const detectors = document.getElementsByClassName('detectors')
+    Array(detectors.length).fill().map((_, i) => detectors[i]).forEach(detector => this.intersectionObserver.observe(detector))
   },
   methods: {
     render(start, length) {
       Array(length).fill()
         .map((_, i) => i + start)
-        .map(i => {
+        .forEach(i => {
           const domIndex = i % RENDER_LENGTH
-          const file = this.fileList[i]
-          this.renderedList[domIndex] = { i, file }
+          const file = this.displayFileList[i]
+          if (file) {
+            this.renderedList[domIndex] = { i, file }
+          } else {
+            this.renderedList[domIndex] = { i: -10 }
+          }
         })
       this.renderedList = [...this.renderedList]
     },
     ...mapActions(['loadFileList'])
   },
   watch: {
-    async fileList() {
+    async displayFileList() {
       this.render(this.renderTop, RENDER_LENGTH)
-      const top = Math.max(0, this.lastIntersect)
-      await this.$nextTick()
-      Array(10).fill().map((_, i) => i + top - 5).map(String).forEach(n => eventEmitter.emit(n))
     },
     renderTop(newVal, oldVal) {
       if (newVal > oldVal) {
-        this.render(oldVal + RENDER_LENGTH, newVal - oldVal)
+        const start = Math.max(newVal, oldVal + RENDER_LENGTH)
+        const end = Math.min(newVal + RENDER_LENGTH, this.displayFileList.length)
+        this.render(start, end - start)
       } else if (oldVal > newVal) {
-        this.render(newVal, oldVal - newVal)
+        const end = Math.min(oldVal, newVal + RENDER_LENGTH)
+        this.render(newVal, end - newVal)
       }
     },
     lastIntersect() {
       const { lastIntersect } = this
-      const margin = lastIntersect - this.renderTop
-      if (margin > RENDER_LENGTH / 2 || margin < RENDER_LENGTH / 2) {
-        this.renderTop = Math.min(Math.max(lastIntersect - RENDER_LENGTH / 2, 0), this.fileList.length - RENDER_LENGTH)
-      }
+      this.renderTop = Math.max(0, lastIntersect - RENDER_LENGTH / 3)
     }
   },
   beforeDestroy() {
     this.observer.disconnect()
+    this.intersectionObserver.disconnect()
   },
   components: {
     vtb
   },
-  computed: mapState(['fileList'])
+  computed: {
+    ...mapState(['fileList']),
+    displayFileList() {
+      return this.fileList
+    },
+    totalHeight() {
+      return this.displayFileList.length * this.height
+    },
+    detectors() {
+      const num = Math.round(this.displayFileList.length / RENDER_LENGTH * 3) + 1
+      const height = this.totalHeight / num
+      return Array(num).fill().map((_, i) => ({ height, top: i * height, i: Math.round(this.displayFileList.length / num * i) }))
+    }
+  }
 }
 </script>
 
@@ -91,5 +114,9 @@ export default {
 
 .indexContainer {
   position: relative;
+}
+
+.detectors {
+  position: absolute;
 }
 </style>
