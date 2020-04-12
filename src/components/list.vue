@@ -70,10 +70,14 @@ export default {
       if (newVal > oldVal) {
         const start = Math.max(newVal, oldVal + RENDER_LENGTH)
         const end = Math.min(newVal + RENDER_LENGTH, this.displayFileList.length)
-        this.render(start, end - start)
+        if (start < end) {
+          const length = end - start
+          this.render(start, length)
+        }
       } else if (oldVal > newVal) {
         const end = Math.min(oldVal, newVal + RENDER_LENGTH)
-        this.render(newVal, end - newVal)
+        const length = end - newVal
+        this.render(newVal, length)
       }
     },
     lastIntersect() {
