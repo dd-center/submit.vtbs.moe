@@ -1,14 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { getList, loadFs } from '@/worker'
+import { getList, loadFs, getMeta } from '@/worker'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     fileList: [],
-    fsLoaded: false
+    fsLoaded: false,
+    meta: {}
   },
   mutations: {
     loadedFs(state) {
@@ -16,6 +17,9 @@ export default new Vuex.Store({
     },
     updateFileList(state, newList) {
       state.fileList = newList
+    },
+    updateMeta(state, meta) {
+      state.meta = meta
     }
   },
   actions: {
@@ -25,6 +29,7 @@ export default new Vuex.Store({
     },
     async loadFs({ commit }) {
       await loadFs()
+      commit('updateMeta', await getMeta())
       commit('loadedFs')
     }
   }

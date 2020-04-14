@@ -17,6 +17,7 @@
           <div class="container">
             <ul>
               <router-link tag="li" to="/" class="link"><a class="aLink">Panel</a></router-link>
+              <router-link tag="li" to="/edit" class="link"><a class="aLink">新建</a></router-link>
               <router-link tag="li" to="/submit" class="link"><a class="aLink">Submit!</a></router-link>
             </ul>
           </div>

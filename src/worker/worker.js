@@ -1,7 +1,9 @@
 import { warp } from './warp'
 
+let list
 let fs
 let newFs
+let newFsLowerCaseFileMap
 
 const encodeBase64 = string => Buffer.from(string).toString('base64')
 
@@ -11,17 +13,33 @@ export const loadFs = warp(async () => {
   fs = await fetchJson('https://vdb.vtbs.moe/json/fs.json')
   if (!newFs) {
     newFs = JSON.parse(JSON.stringify(fs))
+    newFsLowerCaseFileMap = Object.fromEntries(Object.keys(newFs)
+      .map(file => [file.toLowerCase(), file]))
   }
+  list = await fetchJson('https://vdb.vtbs.moe/json/list.json')
 })
+
+export const getMeta = warp(() => list.meta)
 
 export const getFs = warp(() => newFs)
 
-export const getList = warp(() => Object.keys(newFs))
+export const getList = warp(() => Object.keys(newFs).reverse())
 
 export const getVtbJson = warp(name => newFs[name])
 
 export const deleteVtb = warp(file => {
   delete newFs[file]
+  delete newFsLowerCaseFileMap[file.toLowerCase()]
+})
+
+export const saveVtb = warp((file, data) => {
+  const fileLowerCase = file.toLowerCase()
+  const currentFile = newFsLowerCaseFileMap[fileLowerCase]
+  if (currentFile) {
+    deleteVtb(currentFile)
+  }
+  newFs[file] = data
+  newFsLowerCaseFileMap[fileLowerCase] = file
 })
 
 const diffFile = file => {
