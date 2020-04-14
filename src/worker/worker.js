@@ -24,7 +24,7 @@ export const deleteVtb = warp(file => {
 
 const diffFile = file => {
   if (!newFs[file]) {
-    return 'delete'
+    return 'remove'
   }
   return undefined
 }
@@ -44,7 +44,7 @@ export const serializeDiff = warp(() => {
   const change = diff()
   return change
     .map(([file, status]) => {
-      if (status === 'delete') {
+      if (status === 'remove') {
         return ['delete', file]
       }
     })
