@@ -15,6 +15,10 @@ const routes = [{
 }, {
   path: '/edit',
   component: Edit
+}, {
+  path: '/edit/:file',
+  component: Edit,
+  props: true
 }]
 
 const router = new VueRouter({

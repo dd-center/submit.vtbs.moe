@@ -14,7 +14,8 @@
     <div class="is-divider-vertical"></div>
     <div class="column">
       <div class="buttons">
-        <button class="button is-danger is-small" @click="remove">Remove</button>
+        <router-link tag="button" class="button is-info is-small" :to="`edit/${file}`">编辑</router-link>
+        <button class="button is-danger is-small" @click="remove">删除</button>
       </div>
     </div>
   </div>
@@ -55,12 +56,7 @@ export default {
   },
   computed: {
     name() {
-      const names = Object.values(this.json.name || { en: 'loading...' })[0]
-      if (typeof names === 'string') {
-        return names
-      } else {
-        return names[0]
-      }
+      return [Object.values(this.json.name || {}), 'loading...'].flat()[0]
     },
     type() {
       return this.json.type || 'vtuber'

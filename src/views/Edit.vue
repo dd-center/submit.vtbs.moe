@@ -138,9 +138,10 @@
 <script>
 import { mapState } from 'vuex'
 
-import { saveVtb } from '@/worker'
+import { saveVtb, getVtbJson, deleteVtb } from '@/worker'
 
 export default {
+  props: ['file'],
   data() {
     const editing = {
       fileName: '',
@@ -150,7 +151,36 @@ export default {
       accounts: [],
       group: ''
     }
-    return { editing, saving: false }
+    return { editing, saving: false, rest: {} }
+  },
+  async mounted() {
+    if (this.file) {
+      this.editing.fileName = this.file.replace('.json', '')
+      const json = await getVtbJson(this.file)
+      const { accounts = {}, name = {}, type, bot, group, ...rest } = json
+
+      Object.entries(name)
+        .flatMap(([lang, names]) => [names].flat().map(n => [lang, n]))
+        .forEach(([lang, n]) => this.editing.names.push([lang, n]))
+
+      Object.entries(accounts)
+        .flatMap(([platform, ids]) => [ids].flat().map(id => [platform, id]))
+        .forEach(([platform, id]) => this.editing.accounts.push({ platform, id }))
+
+      if (type) {
+        this.editing.type = type
+      }
+
+      if (bot) {
+        this.editing.bot = bot
+      }
+
+      if (group) {
+        this.editing.group = group
+      }
+
+      this.rest = rest
+    }
   },
   methods: {
     addName() {
@@ -167,7 +197,10 @@ export default {
     },
     async save() {
       this.saving = true
-      await saveVtb(this.fileName, this.code)
+      if (this.file) {
+        await deleteVtb(this.file)
+      }
+      await saveVtb(this.fileName, this.data)
       this.saving = false
     }
   },
@@ -232,7 +265,7 @@ export default {
         }
       }
 
-      return file
+      return { ...this.rest, ...file }
     }
   }
 }
