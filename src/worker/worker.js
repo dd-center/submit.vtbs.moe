@@ -3,6 +3,8 @@ import { warp } from './warp'
 let fs
 let newFs
 
+const encodeBase64 = string => Buffer.from(string).toString('base64')
+
 const fetchJson = async url => (await fetch(url)).json()
 
 export const loadFs = warp(async () => {
@@ -60,8 +62,8 @@ export const serializeDiff = warp(() => {
 
 const encodeDiff = () => {
   const command = serializeDiff()
-  return btoa(command
-    .map(([cmd, file]) => [cmd, btoa(file)])
+  return encodeBase64(command
+    .map(([cmd, file]) => [cmd, encodeBase64(file)])
     .map(cmds => cmds.join(':'))
     .join('\n'))
 }

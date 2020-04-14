@@ -59,5 +59,6 @@ export default {
 code {
   display: block;
   white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>
