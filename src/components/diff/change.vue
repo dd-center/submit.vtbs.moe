@@ -1,6 +1,6 @@
 <template>
 <div>
-  <p :class="{ 'has-text-danger': status === 'remove'}">{{file}}</p>
+  <p :class="{ 'has-text-danger': status === 'remove', 'has-text-success': status === 'add', 'has-text-warning': status === 'update'}">{{file}}</p>
 </div>
 </template>
 

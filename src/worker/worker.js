@@ -26,6 +26,12 @@ const diffFile = file => {
   if (!newFs[file]) {
     return 'remove'
   }
+  if (!fs[file]) {
+    return 'add'
+  }
+  if (JSON.stringify(fs[file]) !== JSON.stringify(newFs[file])) {
+    return 'update'
+  }
   return undefined
 }
 
@@ -37,6 +43,7 @@ const describeDiff = () => {
   const change = diff()
   return change
     .map(([file, status]) => `${status}: ${file}`)
+    .sort()
     .join('\n')
 }
 
