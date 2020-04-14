@@ -8,12 +8,14 @@
         <tr>
           <th>Command</th>
           <th>File</th>
+          <th>content</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="[cmd, file] in code" :key="`s_${file}`">
+        <tr v-for="[cmd, file, content = ''] in code" :key="`s_${file}`">
           <td>{{cmd}}</td>
           <td>{{file}}</td>
+          <td><code v-if="!!content">{{content}}</code></td>
         </tr>
       </tbody>
     </table>
@@ -37,3 +39,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+code {
+  display: block;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+</style>

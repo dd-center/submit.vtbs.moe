@@ -71,8 +71,13 @@ export const serializeDiff = warp(() => {
   const change = diff()
   return change
     .map(([file, status]) => {
-      if (status === 'remove') {
-        return ['delete', file]
+      switch (status) {
+        case 'remove':
+          return ['delete', file]
+        case 'add':
+        case 'update':
+          return ['put', file, JSON.stringify(getVtbJson(file), undefined, 2)]
+        default:
       }
     })
     .filter(Boolean)
@@ -81,7 +86,13 @@ export const serializeDiff = warp(() => {
 const encodeDiff = () => {
   const command = serializeDiff()
   return encodeBase64(command
-    .map(([cmd, file]) => [cmd, encodeBase64(file)])
+    .map(([cmd, file, content]) => {
+      const line = [cmd, encodeBase64(file)]
+      if (content) {
+        line.push(encodeBase64(content))
+      }
+      return line
+    })
     .map(cmds => cmds.join(':'))
     .join('\n'))
 }
