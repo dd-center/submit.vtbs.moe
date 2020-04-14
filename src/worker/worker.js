@@ -29,7 +29,7 @@ const diffFile = file => {
   return undefined
 }
 
-export const diff = warp(() => [...new Set([...Object.keys(fs), ...Object.keys(fs)])]
+export const diff = warp(() => [...new Set([...Object.keys(fs), ...Object.keys(newFs)])]
   .map(file => [file, diffFile(file)])
   .filter(([_, status]) => status))
 
