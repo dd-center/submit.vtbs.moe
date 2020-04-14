@@ -14,6 +14,8 @@ import vtb, { height, eventEmitter } from './list/vtb'
 
 const RENDER_LENGTH = 150
 
+let lastIntersectN = 0
+
 export default {
   data() {
     return {
@@ -31,6 +33,7 @@ export default {
       if (isIntersecting) {
         const n = target.getAttribute('n')
         eventEmitter.emit(n)
+        lastIntersectN = Number(n)
       }
     }), { root: this.$refs.container, thresholds: [0] })
     this.intersectionObserver = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
@@ -65,6 +68,12 @@ export default {
   watch: {
     async displayFileList() {
       this.render(this.renderTop, RENDER_LENGTH)
+      await this.$nextTick()
+      Array(10)
+        .fill(Math.max(0, lastIntersectN + RENDER_LENGTH - 5))
+        .map((base, i) => (i + base) % RENDER_LENGTH)
+        .map(String)
+        .forEach(n => eventEmitter.emit(n))
     },
     renderTop(newVal, oldVal) {
       if (newVal > oldVal) {

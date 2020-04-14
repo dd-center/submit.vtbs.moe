@@ -90,8 +90,8 @@
   <div class="field is-horizontal" v-for="({id, platform, type}, n) in editing.accounts" :key="`account_${n}`">
     <div class="field-label is-normal">
       <label class="label" v-if="!n">账号</label>
-      <p v-if="!id || !urls[n].startsWith('http')" class="help">{{urls[n]}}</p>
-      <a v-else :href="urls[n]" target="_blank" class="help">{{urls[n]}}</a>
+      <p v-if="!id || !urls[n].startsWith('http')" class="help url">{{urls[n]}}</p>
+      <a v-else :href="urls[n]" target="_blank" class="help url">{{urls[n]}}</a>
     </div>
     <div class="field-body">
       <div class="field has-addons">
@@ -280,5 +280,9 @@ export default {
 code {
   display: block;
   white-space: pre-wrap;
+}
+
+.url {
+  word-break: break-all;
 }
 </style>
