@@ -124,7 +124,7 @@
       <button class="button is-link" :class="{ 'is-loading': saving }" :disabled="!editing.fileName || saving" @click="save">保存 {{fileName}}</button>
     </div>
     <div class="control">
-      <button class="button is-link is-light">复原</button>
+      <button class="button is-link is-light" @click="reset">复原</button>
     </div>
   </div>
 
@@ -151,7 +151,7 @@ export default {
       accounts: [],
       group: ''
     }
-    return { editing, saving: false, rest: {} }
+    return { editing, backup: JSON.parse(JSON.stringify(editing)), saving: false, rest: {} }
   },
   async mounted() {
     if (this.file) {
@@ -179,6 +179,8 @@ export default {
         this.editing.group = group
       }
 
+      this.backup = JSON.parse(JSON.stringify(this.editing))
+
       this.rest = rest
     }
   },
@@ -202,6 +204,9 @@ export default {
       }
       await saveVtb(this.fileName, this.data)
       this.saving = false
+    },
+    reset() {
+      this.editing = JSON.parse(JSON.stringify(this.backup))
     }
   },
   computed: {
