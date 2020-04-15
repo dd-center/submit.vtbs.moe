@@ -77,11 +77,9 @@ export default {
   },
   watch: {
     async detectors(detectors, oldDetectors = []) {
-      if (detectors.length > oldDetectors.length) {
-        await this.$nextTick()
-        if (this.$refs.detectors) {
-          this.$refs.detectors.forEach(detector => this.intersectionObserver.observe(detector))
-        }
+      await this.$nextTick()
+      if (this.$refs.detectors) {
+        this.$refs.detectors.forEach(detector => this.intersectionObserver.observe(detector))
       }
     },
     async search(string) {

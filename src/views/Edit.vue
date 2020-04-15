@@ -151,39 +151,53 @@ export default {
       accounts: [],
       group: ''
     }
-    return { editing, backup: JSON.parse(JSON.stringify(editing)), saving: false, rest: {} }
+    this.backup = JSON.stringify(editing)
+    this.blank = JSON.stringify(editing)
+
+    return { editing, saving: false, rest: {} }
   },
-  async mounted() {
-    if (this.file) {
-      this.editing.fileName = this.file.replace('.json', '')
-      const json = await getVtbJson(this.file)
-      const { accounts = {}, name = {}, type, bot, group, ...rest } = json
+  watch: {
+    file: {
+      immediate: true,
+      async handler(file, oldFile) {
+        if (file !== oldFile) {
+          if (file) {
+            this.editing.fileName = file.replace('.json', '')
+            const json = await getVtbJson(file)
+            const { accounts = {}, name = {}, type, bot, group, ...rest } = json
 
-      Object.entries(name)
-        .flatMap(([lang, names]) => [names].flat().map(n => [lang, n]))
-        .forEach(([lang, n]) => this.editing.names.push([lang, n]))
+            Object.entries(name)
+              .flatMap(([lang, names]) => [names].flat().map(n => [lang, n]))
+              .forEach(([lang, n]) => this.editing.names.push([lang, n]))
 
-      Object.entries(accounts)
-        .flatMap(([platform, ids]) => [ids].flat().map(id => [platform, id]))
-        .forEach(([platform, id]) => this.editing.accounts.push({ platform, id }))
+            Object.entries(accounts)
+              .flatMap(([platform, ids]) => [ids].flat().map(id => [platform, id]))
+              .forEach(([platform, id]) => this.editing.accounts.push({ platform, id }))
 
-      if (type) {
-        this.editing.type = type
+            if (type) {
+              this.editing.type = type
+            }
+
+            if (bot) {
+              this.editing.bot = bot
+            }
+
+            if (group) {
+              this.editing.group = group
+            }
+
+            this.backup = JSON.stringify(this.editing)
+
+            this.rest = rest
+          } else {
+            this.backup = this.blank
+            this.reset()
+          }
+        }
       }
-
-      if (bot) {
-        this.editing.bot = bot
-      }
-
-      if (group) {
-        this.editing.group = group
-      }
-
-      this.backup = JSON.parse(JSON.stringify(this.editing))
-
-      this.rest = rest
     }
   },
+  async mounted() {},
   methods: {
     addName() {
       this.editing.names.push(['', ''])
@@ -206,7 +220,7 @@ export default {
       this.saving = false
     },
     reset() {
-      this.editing = JSON.parse(JSON.stringify(this.backup))
+      this.editing = JSON.parse(this.backup)
     }
   },
   computed: {
