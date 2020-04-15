@@ -1,5 +1,8 @@
 import { warp } from './warp'
 
+import vdbParse from '../vdb/parse'
+import vdbTest from '../vdb/test'
+
 let list
 let fs
 let newFs
@@ -41,6 +44,10 @@ export const saveVtb = warp((file, data) => {
   newFs[file] = data
   newFsLowerCaseFileMap[fileLowerCase] = file
 })
+
+const parse = () => vdbParse({ ...list.meta, vtbs: Object.entries(newFs).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) })
+
+export const test = warp(() => vdbTest(parse()))
 
 const diffFile = file => {
   if (!newFs[file]) {

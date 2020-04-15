@@ -1,0 +1,3 @@
+[submodule "src/vdb"]
+	path = src/vdb
+	url = https://github.com/dd-center/vdb.git
