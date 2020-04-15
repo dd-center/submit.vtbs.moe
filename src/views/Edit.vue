@@ -73,18 +73,6 @@
     </div>
   </div>
 
-  <div class="field is-horizontal">
-    <div class="field-label is-normal">
-      <label class="label">所属社团</label>
-      <p class="help">这里写社团记录的文件名, 无所属留空</p>
-    </div>
-    <div class="field-body">
-      <div class="field">
-        <div class="control"><input class="input" type="text" placeholder="社团" v-model="editing.group"></div>
-      </div>
-    </div>
-  </div>
-
   <hr>
 
   <div class="field is-horizontal" v-for="({id, platform, type}, n) in editing.accounts" :key="`account_${n}`">
@@ -119,6 +107,21 @@
 
   <hr>
 
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">所属社团</label>
+      <p class="help">这里写所属社团记录的文件名, 无所属留空</p>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control"><input class="input" type="text" placeholder="社团" v-model="editing.group"></div>
+        <button class="button is-text" v-for="group in groupAuto" :key="`groupAuto_${group}`" @click="editing.group = group">{{group}}</button>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
   <div class="field is-grouped">
     <div class="control">
       <button class="button is-link" :class="{ 'is-loading': saving }" :disabled="!editing.fileName || saving" @click="save">保存 {{fileName}}</button>
@@ -138,7 +141,7 @@
 <script>
 import { mapState } from 'vuex'
 
-import { saveVtb, getVtbJson, deleteVtb } from '@/worker'
+import { saveVtb, getVtbJson, deleteVtb, getGroupList } from '@/worker'
 
 export default {
   props: ['file'],
@@ -154,7 +157,7 @@ export default {
     this.backup = JSON.stringify(editing)
     this.blank = JSON.stringify(editing)
 
-    return { editing, saving: false, rest: {} }
+    return { editing, saving: false, rest: {}, groupList: [] }
   },
   watch: {
     file: {
@@ -195,6 +198,7 @@ export default {
             this.reset()
           }
         }
+        this.groupList = await getGroupList()
       }
     }
   },
@@ -226,6 +230,16 @@ export default {
   },
   computed: {
     ...mapState(['meta']),
+    groupAuto() {
+      const input = this.editing.group
+      const keys = input.toLowerCase().split(' ').filter(Boolean)
+      const result = this.groupList
+        .filter(group => keys.every(key => group.toLowerCase().includes(key)))
+      if (result.length === 1 && result[0] === input) {
+        return []
+      }
+      return result
+    },
     platforms() {
       return Object.entries(this.meta.linkSyntax)
     },

@@ -35,6 +35,11 @@ export const getFs = warp(() => newFs)
 
 export const getList = warp(() => Object.keys(newFs).reverse())
 
+export const getGroupList = warp(() => Object.entries(newFs)
+  .map(([file, { type }]) => ({ file, type }))
+  .filter(({ type }) => type === 'group')
+  .map(({ file }) => file.replace('.json', '')))
+
 export const searchList = warp(keys => getList()
   .map(file => [file, newFsJsonSearchMap.get(file)])
   .filter(([_, content]) => keys.every(key => content.includes(key)))
