@@ -132,7 +132,7 @@ ${description}
 -----BEGIN SUBMIT BLOCK-----${command}-----END SUBMIT BLOCK-----
 \`\`\`
 
-Submit from submit.vtbs.moe, please evaluate the automatic Pull Request`
+Submit from <https://submit.vtbs.moe>, please evaluate the automatic Pull Request`
 })
 
 export const submitDiff = warp(async input => {
