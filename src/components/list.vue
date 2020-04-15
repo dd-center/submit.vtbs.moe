@@ -1,14 +1,23 @@
 <template>
 <div class="index" ref="container">
-  <div class="indexContainer" :style="{ height: totalHeight+ 'px' }">
-    <vtb v-for="({i=0,file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file" :n="n"></vtb>
-    <div class="detectors" v-for="({height,top,i},n) in detectors" :key="`detector_${n}`" :i="i" :style="{ height:`${height}px`, top:`${top}px` }"></div>
+  <div class="control search" :class="{ 'is-loading' : searching}">
+    <input class="input" type="text" placeholder="搜索" v-model="search">
   </div>
+  <div class="indexContainer" :style="{ height: totalHeight + 'px' }">
+    <vtb v-for="({i=0,file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file" :n="n"></vtb>
+    <div class="detectors" v-for="({height,top,i,ref}) in detectors" :key="ref" :i="i" :ref="'detectors'" :style="{ height:`${height}px`, top:`${top}px` }"></div>
+  </div>
+  <template v-if="!displayFileList.length">
+    <br>
+    <hr>
+    <p>无结果...</p>
+  </template>
 </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { searchList } from '@/worker'
 
 import vtb, { height, eventEmitter } from './list/vtb'
 
@@ -24,7 +33,10 @@ export default {
       lastIntersect: 0,
       renderedList: Array(RENDER_LENGTH).fill({}),
       observer: undefined,
-      intersectionObserver: undefined
+      intersectionObserver: undefined,
+      search: '',
+      searchResult: undefined,
+      searching: false
     }
   },
   async mounted() {
@@ -35,7 +47,7 @@ export default {
         eventEmitter.emit(n)
         lastIntersectN = Number(n)
       }
-    }), { root: this.$refs.container, thresholds: [0] })
+    }), { root: this.$refs.container, thresholds: [0], rootMargin: '80px 0px 20px 0px' })
     this.intersectionObserver = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
       if (isIntersecting) {
         const i = Number(target.getAttribute('i'))
@@ -45,8 +57,6 @@ export default {
     await this.$nextTick()
     const vtbs = document.getElementsByClassName('vtb')
     Array(vtbs.length).fill().map((_, i) => vtbs[i]).forEach(vtb => this.observer.observe(vtb))
-    const detectors = document.getElementsByClassName('detectors')
-    Array(detectors.length).fill().map((_, i) => detectors[i]).forEach(detector => this.intersectionObserver.observe(detector))
   },
   methods: {
     render(start, length) {
@@ -66,6 +76,28 @@ export default {
     ...mapActions(['loadFileList'])
   },
   watch: {
+    async detectors(detectors, oldDetectors = []) {
+      if (detectors.length > oldDetectors.length) {
+        await this.$nextTick()
+        if (this.$refs.detectors) {
+          this.$refs.detectors.forEach(detector => this.intersectionObserver.observe(detector))
+        }
+      }
+    },
+    async search(string) {
+      const keys = string.toLowerCase().split(' ').filter(Boolean)
+      if (keys.length) {
+        this.searching = true
+        const result = await searchList(keys)
+        if (string === this.search) {
+          this.searchResult = result
+          this.searching = false
+        }
+      } else {
+        this.searching = false
+        this.searchResult = undefined
+      }
+    },
     async displayFileList() {
       this.render(this.renderTop, RENDER_LENGTH)
       await this.$nextTick()
@@ -104,7 +136,7 @@ export default {
   computed: {
     ...mapState(['fileList']),
     displayFileList() {
-      return this.fileList
+      return this.searchResult || this.fileList
     },
     totalHeight() {
       return this.displayFileList.length * this.height
@@ -112,7 +144,7 @@ export default {
     detectors() {
       const num = Math.round(this.displayFileList.length / RENDER_LENGTH * 3) + 1
       const height = this.totalHeight / num
-      return Array(num).fill().map((_, i) => ({ height, top: i * height, i: Math.round(this.displayFileList.length / num * i) }))
+      return Array(num).fill().map((_, i) => ({ ref: `detector_${i}`, height, top: i * height, i: Math.round(this.displayFileList.length / num * i) }))
     }
   }
 }
@@ -127,6 +159,13 @@ export default {
 
 .indexContainer {
   position: relative;
+  top: -25px;
+}
+
+.search {
+  position: relative;
+  z-index: 100;
+  top: 8px;
 }
 
 .detectors {

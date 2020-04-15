@@ -7,10 +7,16 @@ let list
 let fs
 let newFs
 let newFsLowerCaseFileMap
+const newFsJsonSearchMap = new Map()
 
 const encodeBase64 = string => Buffer.from(string).toString('base64')
 
 const fetchJson = async url => (await fetch(url)).json()
+
+const updateNewFsJsonSearchMap = (files = Object.keys(newFs)) => [files].flat()
+  .forEach(file => {
+    newFsJsonSearchMap.set(file, `${file}${JSON.stringify(newFs[file]).toLowerCase()}`)
+  })
 
 export const loadFs = warp(async () => {
   fs = await fetchJson('https://vdb.vtbs.moe/json/fs.json')
@@ -18,6 +24,7 @@ export const loadFs = warp(async () => {
     newFs = JSON.parse(JSON.stringify(fs))
     newFsLowerCaseFileMap = Object.fromEntries(Object.keys(newFs)
       .map(file => [file.toLowerCase(), file]))
+    updateNewFsJsonSearchMap()
   }
   list = await fetchJson('https://vdb.vtbs.moe/json/list.json')
 })
@@ -28,11 +35,17 @@ export const getFs = warp(() => newFs)
 
 export const getList = warp(() => Object.keys(newFs).reverse())
 
+export const searchList = warp(keys => getList()
+  .map(file => [file, newFsJsonSearchMap.get(file)])
+  .filter(([_, content]) => keys.every(key => content.includes(key)))
+  .map(([file]) => file))
+
 export const getVtbJson = warp(name => newFs[name])
 
 export const deleteVtb = warp(file => {
   delete newFs[file]
   delete newFsLowerCaseFileMap[file.toLowerCase()]
+  newFsJsonSearchMap.delete(file)
 })
 
 export const saveVtb = warp((file, data) => {
@@ -43,6 +56,7 @@ export const saveVtb = warp((file, data) => {
   }
   newFs[file] = data
   newFsLowerCaseFileMap[fileLowerCase] = file
+  updateNewFsJsonSearchMap(file)
 })
 
 const parse = () => vdbParse({ ...list.meta, vtbs: Object.entries(newFs).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) })
