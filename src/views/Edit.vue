@@ -191,6 +191,7 @@ export default {
             this.rest = rest
           } else {
             this.backup = this.blank
+            this.rest = {}
             this.reset()
           }
         }
