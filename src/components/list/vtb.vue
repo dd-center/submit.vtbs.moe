@@ -100,6 +100,8 @@ export default {
 }
 
 .name {
-  overflow-x: scroll;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
