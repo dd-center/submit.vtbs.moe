@@ -1,7 +1,7 @@
 <template>
 <div id="app">
   <div>
-    <section class="hero is-success is-fullheight">
+    <section class="hero is-success is-fullheight is-bold">
       <div class="hero-body">
         <div class="container">
           <h1 class="title">
