@@ -20,7 +20,7 @@
   <div class="field is-horizontal" v-for="(name, n) in editing.names" :key="`name_${n}`">
     <div class="field-label is-normal">
       <label class="label" v-if="!n">名字</label>
-      <p class="help">语言可以是 cn, en, jp 之类的</p>
+      <p class="help" v-if="!n">语言可以是 cn, en, jp 之类的</p>
     </div>
     <div class="field-body">
       <div class="field has-addons">
