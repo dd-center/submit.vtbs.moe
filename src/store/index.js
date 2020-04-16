@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { getList, loadFs, getMeta, diff } from '@/worker'
+import { getList, loadFs, getMeta, diff, loadWorkspaceList } from '@/worker'
 
 Vue.use(Vuex)
 
@@ -10,7 +10,8 @@ export default new Vuex.Store({
     fileList: [],
     fsLoaded: false,
     meta: {},
-    diff: []
+    diff: [],
+    workspaceList: []
   },
   mutations: {
     loadedFs(state) {
@@ -24,12 +25,16 @@ export default new Vuex.Store({
     },
     updateDiff(state, diff) {
       state.diff = diff
+    },
+    updateWorkspaceList(state, list) {
+      state.workspaceList = list
     }
   },
   actions: {
-    async loadFileList({ commit }) {
+    async loadFileList({ commit, dispatch }) {
       const newList = await getList()
       commit('updateFileList', newList)
+      await dispatch('loadDiff')
     },
     async loadFs({ commit }) {
       await loadFs()
@@ -38,6 +43,9 @@ export default new Vuex.Store({
     },
     async loadDiff({ commit }) {
       commit('updateDiff', await diff())
+    },
+    async loadWorkspaceList({ commit }) {
+      commit('updateWorkspaceList', await loadWorkspaceList())
     }
   }
 })

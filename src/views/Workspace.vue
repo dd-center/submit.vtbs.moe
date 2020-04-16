@@ -31,20 +31,19 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
-import { loadWorkspaceList, saveWorkspace, loadWorkspace, deleteWorkspace } from '@/worker'
+import { saveWorkspace, loadWorkspace, deleteWorkspace } from '@/worker'
 
 export default {
   data() {
     return {
-      workspaceList: [],
       workspaceListLoaded: false,
       name: ''
     }
   },
   async mounted() {
-    await this.reloadWorkspaceList()
+    await this.loadWorkspaceList()
     this.workspaceListLoaded = true
   },
   computed: {
@@ -53,17 +52,17 @@ export default {
         return this.workspaceList.length
       }
       return 'loading...'
-    }
+    },
+    ...mapState(['workspaceList'])
   },
   methods: {
-    ...mapActions(['loadFileList']),
-    async reloadWorkspaceList() {
-      this.workspaceList = await loadWorkspaceList()
-    },
+    ...mapActions(['loadFileList', 'loadWorkspaceList']),
     async save() {
       const name = this.name
-      await saveWorkspace(name)
-      await this.reloadWorkspaceList()
+      if (name) {
+        await saveWorkspace(name)
+        await this.loadWorkspaceList()
+      }
     },
     async load(name) {
       await loadWorkspace(name)
@@ -71,7 +70,7 @@ export default {
     },
     async remove(name) {
       await deleteWorkspace(name)
-      await this.reloadWorkspaceList()
+      await this.loadWorkspaceList()
     }
   }
 }

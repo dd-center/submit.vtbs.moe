@@ -39,8 +39,7 @@ export default {
       searching: false
     }
   },
-  async mounted() {
-    await this.loadFileList()
+  created() {
     this.observer = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
       if (isIntersecting) {
         const n = target.getAttribute('n')
@@ -54,6 +53,9 @@ export default {
         this.lastIntersect = i
       }
     }), { root: this.$refs.container, thresholds: [0] })
+  },
+  async mounted() {
+    await this.loadFileList()
     await this.$nextTick()
     const vtbs = document.getElementsByClassName('vtb')
     Array(vtbs.length).fill().map((_, i) => vtbs[i]).forEach(vtb => this.observer.observe(vtb))

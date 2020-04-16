@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 import { saveVtb, getVtbJson, deleteVtb, getGroupList } from '@/worker'
 
@@ -221,6 +221,7 @@ export default {
   },
   async mounted() {},
   methods: {
+    ...mapActions(['loadFileList']),
     addName() {
       this.editing.names.push(['', ''])
     },
@@ -241,6 +242,7 @@ export default {
       await saveVtb(this.fileName, this.data)
       this.saving = false
       this.saved = true
+      await this.loadFileList()
     },
     reset() {
       this.editing = JSON.parse(this.backup)

@@ -12,10 +12,10 @@ import { resetVtb } from '@/worker'
 export default {
   props: ['status', 'file'],
   methods: {
-    ...mapActions(['loadDiff']),
+    ...mapActions(['loadFileList']),
     async reset() {
       await resetVtb(this.file)
-      await this.loadDiff()
+      await this.loadFileList()
     }
   }
 }
