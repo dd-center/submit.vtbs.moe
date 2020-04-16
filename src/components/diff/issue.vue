@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import { diff, makeIssue, submitDiff } from '@/worker'
 
 export default {
@@ -35,14 +37,16 @@ export default {
   async mounted() {
     this.diffLength = (await diff()).length
   },
+  computed: mapState(['diff']),
   watch: {
+    async diff() {
+      this.diffLength = (await diff()).length
+      await this.updateIssue()
+    },
     input: {
       immediate: true,
-      async handler(input) {
-        const issue = await makeIssue(input)
-        if (this.input === input) {
-          this.issue = issue
-        }
+      handler() {
+        this.updateIssue()
       }
     }
   },
@@ -50,6 +54,13 @@ export default {
     async submit() {
       this.urlLoading = true
       this.url = await submitDiff(this.input)
+    },
+    async updateIssue() {
+      const input = this.input
+      const issue = await makeIssue(input)
+      if (this.input === input) {
+        this.issue = issue
+      }
     }
   }
 }

@@ -64,6 +64,14 @@ export const saveVtb = warp((file, data) => {
   updateNewFsJsonSearchMap(file)
 })
 
+export const resetVtb = warp(file => {
+  if (fs[file]) {
+    saveVtb(file, JSON.parse(JSON.stringify(fs[file])))
+  } else {
+    deleteVtb(file)
+  }
+})
+
 const parse = () => vdbParse({ ...list.meta, vtbs: Object.entries(newFs).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) })
 
 export const test = warp(() => vdbTest(parse()))

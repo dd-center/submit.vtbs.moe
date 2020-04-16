@@ -7,17 +7,28 @@
 </template>
 
 <script>
-import { diff } from '@/worker'
+import { mapState, mapActions } from 'vuex'
 
 import change from './diff/change'
 
 export default {
   data() {
-    return { diff: [], diffLoad: 'loadingi' }
+    return { diffLoaded: false }
   },
   async mounted() {
-    this.diff = await diff()
-    this.diffLoad = this.diff.length
+    await this.loadDiff()
+    this.diffLoaded = true
+  },
+  methods: mapActions(['loadDiff']),
+  computed: {
+    ...mapState(['diff']),
+    diffLoad() {
+      if (this.diffLoaded) {
+        return this.diff.length
+      } else {
+        return 'loading...'
+      }
+    }
   },
   components: { change }
 }

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { getList, loadFs, getMeta } from '@/worker'
+import { getList, loadFs, getMeta, diff } from '@/worker'
 
 Vue.use(Vuex)
 
@@ -9,7 +9,8 @@ export default new Vuex.Store({
   state: {
     fileList: [],
     fsLoaded: false,
-    meta: {}
+    meta: {},
+    diff: []
   },
   mutations: {
     loadedFs(state) {
@@ -20,6 +21,9 @@ export default new Vuex.Store({
     },
     updateMeta(state, meta) {
       state.meta = meta
+    },
+    updateDiff(state, diff) {
+      state.diff = diff
     }
   },
   actions: {
@@ -31,6 +35,9 @@ export default new Vuex.Store({
       await loadFs()
       commit('updateMeta', await getMeta())
       commit('loadedFs')
+    },
+    async loadDiff({ commit }) {
+      commit('updateDiff', await diff())
     }
   }
 })

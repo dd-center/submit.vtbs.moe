@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import { serializeDiff } from '@/worker'
 
 export default {
@@ -34,9 +36,15 @@ export default {
       ]
     }
   },
+  watch: {
+    async diff() {
+      this.code = await serializeDiff()
+    }
+  },
   async mounted() {
     this.code = await serializeDiff()
-  }
+  },
+  computed: mapState(['diff'])
 }
 </script>
 
