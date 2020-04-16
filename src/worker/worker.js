@@ -1,7 +1,11 @@
+import level from 'level'
+
 import { warp } from './warp'
 
 import vdbParse from '../vdb/parse'
 import vdbTest from '../vdb/test'
+
+const workspace = level('submit.vtbs.moe-workspace')
 
 let list
 let fs
@@ -27,6 +31,32 @@ export const loadFs = warp(async () => {
     updateNewFsJsonSearchMap()
   }
   list = await fetchJson('https://vdb.vtbs.moe/json/list.json')
+})
+
+export const loadWorkspaceList = warp(() => new Promise(resolve => {
+  const list = []
+  workspace.createKeyStream()
+    .on('data', (key) => {
+      list.push(key)
+    })
+    .on('end', () => {
+      resolve(list)
+    })
+}))
+
+export const saveWorkspace = warp(async name => {
+  await workspace.put(name, JSON.stringify(newFs))
+})
+
+export const loadWorkspace = warp(async name => {
+  newFs = JSON.parse(await workspace.get(name))
+  newFsLowerCaseFileMap = Object.fromEntries(Object.keys(newFs)
+    .map(file => [file.toLowerCase(), file]))
+  updateNewFsJsonSearchMap()
+})
+
+export const deleteWorkspace = warp(async name => {
+  await workspace.del(name)
 })
 
 export const getMeta = warp(() => list.meta)
