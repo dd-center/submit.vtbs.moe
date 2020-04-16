@@ -122,12 +122,22 @@
 
   <hr>
 
-  <div class="field is-grouped">
-    <div class="control">
-      <button class="button is-link" :class="{ 'is-loading': saving }" :disabled="!editing.fileName || saving" @click="save">保存 {{fileName}}</button>
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <p class="help" v-if="saved">保存成功!</p>
     </div>
-    <div class="control">
-      <button class="button is-link is-light" @click="reset">复原</button>
+    <div class="field-body">
+      <div class="field is-grouped">
+        <div class="control">
+          <button class="button is-link" :class="{ 'is-loading': saving }" :disabled="!editing.fileName || saving" @click="save">保存 {{fileName}}</button>
+        </div>
+        <div class="control">
+          <button class="button is-link is-light" @click="reset">复原</button>
+        </div>
+        <div class="control">
+          <router-link class="button is-light" tag="button" to="/">返回</router-link>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -157,9 +167,15 @@ export default {
     this.backup = JSON.stringify(editing)
     this.blank = JSON.stringify(editing)
 
-    return { editing, saving: false, rest: {}, groupList: [] }
+    return { editing, saving: false, saved: false, rest: {}, groupList: [] }
   },
   watch: {
+    editing: {
+      deep: true,
+      handler() {
+        this.saved = false
+      }
+    },
     file: {
       immediate: true,
       async handler(file, oldFile) {
@@ -223,6 +239,7 @@ export default {
       }
       await saveVtb(this.fileName, this.data)
       this.saving = false
+      this.saved = true
     },
     reset() {
       this.editing = JSON.parse(this.backup)
