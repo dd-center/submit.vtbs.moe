@@ -110,7 +110,8 @@
   <div class="field is-horizontal">
     <div class="field-label is-normal">
       <label class="label">所属社团</label>
-      <p class="help">这里写所属社团记录的文件名, 无所属留空</p>
+      <p class="help">这里写所属社团记录的文件名<br>(不需要文件后缀)</p>
+      <p class="help">无所属留空</p>
     </div>
     <div class="field-body">
       <div class="field">
