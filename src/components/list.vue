@@ -1,7 +1,7 @@
 <template>
 <div class="index" ref="container">
   <div class="control search" :class="{ 'is-loading' : searching}">
-    <input class="input" type="text" placeholder="搜索" v-model="search">
+    <input class="input" type="text" placeholder="搜索" v-model="searchInput">
   </div>
   <div class="indexContainer" :style="{ height: totalHeight + 'px' }">
     <vtb v-for="({i=0,file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file" :n="n"></vtb>
@@ -34,7 +34,7 @@ export default {
       renderedList: Array(RENDER_LENGTH).fill({}),
       observer: undefined,
       intersectionObserver: undefined,
-      search: '',
+      searchInput: '',
       searchResult: undefined,
       searching: false
     }
@@ -73,6 +73,20 @@ export default {
         })
       this.renderedList = [...this.renderedList]
     },
+    async search(string) {
+      const keys = string.toLowerCase().split(' ').filter(Boolean)
+      if (keys.length) {
+        this.searching = true
+        const result = await searchList(keys)
+        if (string === this.searchInput) {
+          this.searchResult = result
+          this.searching = false
+        }
+      } else {
+        this.searching = false
+        this.searchResult = undefined
+      }
+    },
     ...mapActions(['loadFileList'])
   },
   watch: {
@@ -82,18 +96,12 @@ export default {
         this.$refs.detectors.forEach(detector => this.intersectionObserver.observe(detector))
       }
     },
-    async search(string) {
-      const keys = string.toLowerCase().split(' ').filter(Boolean)
-      if (keys.length) {
-        this.searching = true
-        const result = await searchList(keys)
-        if (string === this.search) {
-          this.searchResult = result
-          this.searching = false
-        }
-      } else {
-        this.searching = false
-        this.searchResult = undefined
+    async searchInput(string) {
+      this.search(string)
+    },
+    fileList() {
+      if (this.searchInput) {
+        this.search(this.searchInput)
       }
     },
     async displayFileList() {
