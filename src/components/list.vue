@@ -99,8 +99,8 @@ export default {
     async displayFileList() {
       this.render(this.renderTop, RENDER_LENGTH)
       await this.$nextTick()
-      Array(10)
-        .fill(Math.max(0, lastIntersectN + RENDER_LENGTH - 5))
+      Array(15)
+        .fill(Math.max(0, lastIntersectN + RENDER_LENGTH - 9))
         .map((base, i) => (i + base) % RENDER_LENGTH)
         .map(String)
         .forEach(n => eventEmitter.emit(n))
