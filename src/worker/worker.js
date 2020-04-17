@@ -123,10 +123,32 @@ export const diff = warp(() => [...new Set([...Object.keys(fs), ...Object.keys(n
   .map(file => [file, diffFile(file)])
   .filter(([_, status]) => status))
 
+const generateLink = file => {
+  const { accounts = {} } = newFs[file]
+  const { linkSyntax } = getMeta()
+  return Object.entries(accounts)
+    .map(([platform, ids]) => [linkSyntax[platform], ids])
+    .map(w => w.flat())
+    .flatMap(([linkFormat = '{id}', ...ids]) => ids.map(id => linkFormat.replace('{id}', id)))
+}
+
 const describeDiff = () => {
   const change = diff()
   return change
-    .map(([file, status]) => `${status}: ${file}`)
+    .map(([file, status]) => {
+      if (status === 'add' || status === 'update') {
+        console.log(generateLink(file))
+        const links = generateLink(file)
+          .map(link => link.startsWith('http') ? `<${link}>` : link)
+          .map(link => `> ${link}`)
+          .join('\n')
+        if (links.length) {
+          return [file, status, `\n${links}\n`]
+        }
+      }
+      return [file, status]
+    })
+    .map(([file, status, detail = '']) => `${status}: ${file}${detail}`)
     .sort()
     .join('\n')
 }
