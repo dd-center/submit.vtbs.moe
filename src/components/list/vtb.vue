@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     name() {
-      return [Object.values(this.json.name || {}), 'loading...'].flat()[0]
+      return [...Object.values(this.json.name || {}), 'loading...'].flat()[0]
     },
     type() {
       return this.json.type || 'vtuber'
