@@ -137,7 +137,6 @@ const describeDiff = () => {
   return change
     .map(([file, status]) => {
       if (status === 'add' || status === 'update') {
-        console.log(generateLink(file))
         const links = generateLink(file)
           .map(link => link.startsWith('http') ? `<${link}>` : link)
           .map(link => `> ${link}`)
