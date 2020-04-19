@@ -44,7 +44,7 @@
   <div class="field is-horizontal">
     <div class="field-label is-normal">
       <label class="label">记录类型</label>
-      <p class="help" v-if="editing.type === 'group'">请为每个社团成员创建单独的记录，不要把成员的账号放进社团的记录</p>
+      <p class="help" v-if="editing.type === 'group'">请为每个社团成员创建单独的文件，不要把成员的账号放进社团的文件</p>
     </div>
     <div class="field-body">
       <div class="field">
