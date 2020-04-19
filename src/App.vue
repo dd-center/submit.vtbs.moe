@@ -20,7 +20,7 @@
               <router-link tag="li" to="/edit" class="link"><a class="aLink">新建</a></router-link>
               <router-link tag="li" to="/submit" class="link"><a class="aLink">提交!({{diff.length}})</a></router-link>
               <router-link tag="li" to="/workspace" class="link"><a class="aLink">工作区存档({{workspaceList.length}})</a></router-link>
-              <router-link tag="li" to="/login" class="link"><a class="aLink">登陆{{currentState}}</a></router-link>
+              <router-link tag="li" to="/login" class="link"><a class="aLink">登录{{currentState}}</a></router-link>
             </ul>
           </div>
         </nav>
