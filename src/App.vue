@@ -20,6 +20,7 @@
               <router-link tag="li" to="/edit" class="link"><a class="aLink">新建</a></router-link>
               <router-link tag="li" to="/submit" class="link"><a class="aLink">提交!({{diff.length}})</a></router-link>
               <router-link tag="li" to="/workspace" class="link"><a class="aLink">工作区存档({{workspaceList.length}})</a></router-link>
+              <router-link tag="li" to="/login" class="link"><a class="aLink">登陆{{currentState}}</a></router-link>
             </ul>
           </div>
         </nav>
@@ -37,9 +38,13 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, createNamespacedHelpers } from 'vuex'
 
 import { eventEmitter } from '@/worker/warp'
+
+import { readToken } from '@/components/login/w'
+
+const { mapGetters: mapLoginGetters, mapActions: mapLoginActions } = createNamespacedHelpers('login')
 
 export default {
   data() {
@@ -53,9 +58,19 @@ export default {
     if (!this.fsLoaded) {
       this.loadFs()
     }
+    const token = readToken()
+    if (token) {
+      this.updateToken(token)
+    }
   },
-  computed: mapState(['fsLoaded', 'workspaceList', 'diff']),
-  methods: mapActions(['loadFs', 'loadWorkspaceList'])
+  computed: {
+    ...mapState(['fsLoaded', 'workspaceList', 'diff']),
+    ...mapLoginGetters(['currentState'])
+  },
+  methods: {
+    ...mapActions(['loadFs', 'loadWorkspaceList']),
+    ...mapLoginActions(['updateToken'])
+  }
 }
 </script>
 

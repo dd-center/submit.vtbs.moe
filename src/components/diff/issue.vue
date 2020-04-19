@@ -6,6 +6,11 @@
     <textarea class="textarea" placeholder="附加信息" v-model="input"></textarea>
     <br>
     <code>{{issue}}</code>
+    <br>
+    <label class="checkbox">
+      <input type="checkbox" v-model="githubCommit" :disabled="!username">
+      以我的GitHub身份Commit <template v-if="!username">(请登陆)</template>
+    </label>
     <hr>
     <button class="button is-link is-light" :class="{ 'is-loading': urlLoading }" @click="submit" v-if="!url">发布</button>
     <a :href="url" target="_blank" v-if="url">{{url}}</a>
@@ -20,9 +25,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, createNamespacedHelpers } from 'vuex'
 
 import { diff, makeIssue, submitDiff } from '@/worker'
+
+const { mapState: mapLoginState, mapMutations: mapLoginMutations, mapGetters } = createNamespacedHelpers('login')
 
 export default {
   data() {
@@ -37,11 +44,26 @@ export default {
   async mounted() {
     this.diffLength = (await diff()).length
   },
-  computed: mapState(['diff']),
+  computed: {
+    ...mapState(['diff']),
+    ...mapLoginState(['commit', 'username', 'token']),
+    ...mapGetters(['command']),
+    githubCommit: {
+      get() {
+        return this.username && this.commit
+      },
+      set(value) {
+        this.setCommit(value)
+      }
+    }
+  },
   watch: {
     async diff() {
       this.diffLength = (await diff()).length
       await this.updateIssue()
+    },
+    command() {
+      this.updateIssue()
     },
     input: {
       immediate: true,
@@ -51,13 +73,18 @@ export default {
     }
   },
   methods: {
+    ...mapLoginMutations(['setCommit']),
     async submit() {
       this.urlLoading = true
-      this.url = await submitDiff(this.input)
+      const params = [this.input, this.command]
+      if (this.username) {
+        params.push(this.token)
+      }
+      this.url = await submitDiff(...params)
     },
     async updateIssue() {
       const input = this.input
-      const issue = await makeIssue(input)
+      const issue = await makeIssue(input, this.command)
       if (this.input === input) {
         this.issue = issue
       }

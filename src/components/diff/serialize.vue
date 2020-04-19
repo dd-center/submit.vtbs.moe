@@ -24,9 +24,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, createNamespacedHelpers } from 'vuex'
 
 import { serializeDiff } from '@/worker'
+
+const { mapGetters } = createNamespacedHelpers('login')
 
 export default {
   data() {
@@ -37,14 +39,20 @@ export default {
     }
   },
   watch: {
-    async diff() {
-      this.code = await serializeDiff()
+    async command() {
+      this.code = await serializeDiff(this.command)
+    },
+    diff: {
+      immediate: true,
+      async handler() {
+        this.code = await serializeDiff(this.command)
+      }
     }
   },
-  async mounted() {
-    this.code = await serializeDiff()
-  },
-  computed: mapState(['diff'])
+  computed: {
+    ...mapState(['diff']),
+    ...mapGetters(['command'])
+  }
 }
 </script>
 

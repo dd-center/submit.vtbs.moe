@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Submit from '../views/Submit.vue'
 import Edit from '../views/Edit.vue'
 import Workspace from '../views/Workspace.vue'
+import Login from '../views/Login.vue'
 
 Vue.use(VueRouter)
 
@@ -23,6 +24,10 @@ const routes = [{
 }, {
   path: '/workspace',
   component: Workspace
+}, {
+  path: '/login',
+  component: Login,
+  props: route => ({ code: route.query.code })
 }]
 
 const router = new VueRouter({

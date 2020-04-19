@@ -152,9 +152,9 @@ const describeDiff = () => {
     .join('\n')
 }
 
-export const serializeDiff = warp(() => {
+export const serializeDiff = warp((extraCommands = []) => {
   const change = diff()
-  return change
+  const command = change
     .map(([file, status]) => {
       switch (status) {
         case 'remove':
@@ -166,10 +166,14 @@ export const serializeDiff = warp(() => {
       }
     })
     .filter(Boolean)
+  if (!command.length) {
+    return []
+  }
+  return [...extraCommands, ...command]
 })
 
-const encodeDiff = () => {
-  const command = serializeDiff()
+const encodeDiff = extraCommands => {
+  const command = serializeDiff(extraCommands)
   return encodeBase64(command
     .map(([cmd, file, content]) => {
       const line = [cmd, encodeBase64(file)]
@@ -182,8 +186,8 @@ const encodeDiff = () => {
     .join('\n'))
 }
 
-export const makeIssue = warp(input => {
-  const command = encodeDiff()
+export const makeIssue = warp((input, extraCommands) => {
+  const command = encodeDiff(extraCommands)
   const description = describeDiff()
 
   return `${input}
@@ -199,14 +203,18 @@ ${description}
 Submit from <https://submit.vtbs.moe>, please evaluate the automatic Pull Request`
 })
 
-export const submitDiff = warp(async input => {
-  const body = makeIssue(input)
+export const submitDiff = warp(async (input, extraCommands, token) => {
+  const body = makeIssue(input, extraCommands)
+
+  const Authorization = token ? `token ${token}` : 'Basic ZGQtY2VudGVyLWJvdDpkZDBiMmY0MjE4OThmNjAzZGYwNGM0NzdkMzQyNmU5MzE4MWRlZTUy'
+
+  console.log({ Authorization })
 
   const response = await fetch('https://api.github.com/repos/dd-center/vdb/issues', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Basic ZGQtY2VudGVyLWJvdDpkZDBiMmY0MjE4OThmNjAzZGYwNGM0NzdkMzQyNmU5MzE4MWRlZTUy'
+      Authorization
     },
     body: JSON.stringify({ title: 'Change requested from submit.vtbs.moe', body })
   })
