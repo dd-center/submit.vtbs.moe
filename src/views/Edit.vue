@@ -192,6 +192,7 @@ export default {
 
             Object.entries(accounts)
               .flatMap(([platform, ids]) => [ids].flat().map(id => [platform, id]))
+              .map(([platform, id]) => [platform, id.id || id])
               .forEach(([platform, id]) => this.editing.accounts.push({ platform, id }))
 
             if (type) {
