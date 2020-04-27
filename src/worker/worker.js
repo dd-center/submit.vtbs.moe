@@ -104,7 +104,7 @@ export const resetVtb = warp(file => {
 
 const parse = () => vdbParse({ ...list.meta, vtbs: Object.entries(newFs).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) })
 
-export const test = warp(() => vdbTest(parse()))
+export const test = warp(() => vdbTest(parse(), Object.keys(newFs)))
 
 const diffFile = file => {
   if (!newFs[file]) {
