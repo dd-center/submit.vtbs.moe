@@ -11,6 +11,7 @@
       <div class="field has-addons">
         <div class="control"><input class="input" type="text" placeholder="文件名" v-model="editing.fileName"></div>
         <div class="control"><a class="button is-static">.json</a></div>
+        <div class="control"><p class="help warn is-danger" v-if="msg.filename">{{msg.filename}}</p></div>
       </div>
     </div>
   </div>
@@ -36,6 +37,7 @@
     </div>
     <div class="field-body">
       <button class="button is-link" @click="addName">添加名字</button>
+      <div class="control"><p class="help warn is-danger" v-if="msg.name">{{msg.name}}</p></div>
     </div>
   </div>
 
@@ -126,6 +128,7 @@
   <div class="field is-horizontal">
     <div class="field-label is-normal">
       <p class="help" v-if="saved">保存成功!</p>
+      <p class="help is-danger" v-if="failed">格式错误，请检查上面的输入!</p>
     </div>
     <div class="field-body">
       <div class="field is-grouped">
@@ -165,16 +168,29 @@ export default {
       accounts: [],
       group: ''
     }
+    this.msg = {}
     this.backup = JSON.stringify(editing)
     this.blank = JSON.stringify(editing)
 
-    return { editing, saving: false, saved: false, rest: {}, groupList: [] }
+    return { editing, saving: false, saved: false, failed: false, rest: {}, groupList: [] }
   },
   watch: {
     editing: {
       deep: true,
       handler() {
         this.saved = false
+        this.failed = false
+      }
+    },
+    'editing.fileName': {
+      handler() {
+        this.checkFileName()
+      }
+    },
+    'editing.names': {
+      deep: true,
+      handler() {
+        this.checkName()
       }
     },
     file: {
@@ -235,15 +251,44 @@ export default {
     deleteAccount(n) {
       this.editing.accounts.splice(n, 1)
     },
+    checkFileName() {
+      this.msg['filename'] = '\\/:*"<>|'.split('').some(char => this.editing.fileName.includes(char)) ? "非法文件名" : undefined
+      return !this.msg['filename']
+    },
+    checkName() {
+      if (this.editing.names.length == 0) {
+        this.msg['name'] = "未填写名称"
+        return false
+      }
+      
+      for (const pair of this.editing.names) {
+        if (!pair[0]) {
+          this.msg['name'] = "未填写语言"
+          return false
+        }
+        if (' ,:*\\/'.split('').some(char => pair[0].includes(char))) {
+          this.msg['name'] = "名称语言无效"
+          return false
+        }
+      }
+      this.msg['name'] = undefined
+      return true
+    },
     async save() {
       this.saving = true
-      if (this.file) {
-        await deleteVtb(this.file)
+      if (this.checkFileName() && this.checkName()) {
+        if (this.file) {
+          await deleteVtb(this.file)
+        }
+        await saveVtb(this.fileName, this.data)
+        this.saving = false
+        this.saved = true
+        await this.loadFileList()
+      } else {
+        this.saving = false
+        this.failed = true
       }
-      await saveVtb(this.fileName, this.data)
-      this.saving = false
-      this.saved = true
-      await this.loadFileList()
+      
     },
     reset() {
       this.editing = JSON.parse(this.backup)
@@ -330,6 +375,11 @@ export default {
 code {
   display: block;
   white-space: pre-wrap;
+}
+
+.warn {
+  font-size: 1rem;
+  margin: 10px;
 }
 
 .url {
