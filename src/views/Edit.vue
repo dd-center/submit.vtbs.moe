@@ -128,6 +128,7 @@
   <div class="field is-horizontal">
     <div class="field-label is-normal">
       <p class="help" v-if="saved">保存成功!</p>
+      <p class="help is-danger" v-if="failed">格式错误，请检查上面的输入!</p>
     </div>
     <div class="field-body">
       <div class="field is-grouped">
@@ -171,13 +172,14 @@ export default {
     this.backup = JSON.stringify(editing)
     this.blank = JSON.stringify(editing)
 
-    return { editing, saving: false, saved: false, rest: {}, groupList: [] }
+    return { editing, saving: false, saved: false, failed: false, rest: {}, groupList: [] }
   },
   watch: {
     editing: {
       deep: true,
       handler() {
         this.saved = false
+        this.failed = false
       }
     },
     'editing.fileName': {
@@ -284,6 +286,7 @@ export default {
         await this.loadFileList()
       } else {
         this.saving = false
+        this.failed = true
       }
       
     },
