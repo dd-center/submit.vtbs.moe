@@ -102,7 +102,7 @@ export const resetVtb = warp(file => {
   }
 })
 
-const parse = () => vdbParse({ ...list.meta, vtbs: Object.entries(newFs).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) })
+const parse = () => vdbParse({ ...list.meta, vtbs: Object.entries(newFs).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) }, true)
 
 export const test = warp(() => vdbTest(parse(), Object.keys(newFs)))
 
