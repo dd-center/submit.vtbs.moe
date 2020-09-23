@@ -19,7 +19,7 @@ const fetchJson = async url => (await fetch(url)).json()
 
 const updateNewFsJsonSearchMap = (files = Object.keys(newFs)) => [files].flat()
   .forEach(file => {
-    newFsJsonSearchMap.set(file, `${file}${JSON.stringify(newFs[file]).toLowerCase()}`)
+    newFsJsonSearchMap.set(file, `${file}${JSON.stringify(newFs[file])}`.toLowerCase())
   })
 
 export const loadFs = warp(async () => {
