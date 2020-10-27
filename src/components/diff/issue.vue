@@ -3,6 +3,9 @@
   <h1 class="title">发布</h1>
   <h2 class="subtitle">Issue</h2>
   <template v-if="diffLength && diffLength > 0">
+    <input class="input" type="text" placeholder="标题" v-model="commitTitle">
+    <br>
+    <br>
     <textarea class="textarea" placeholder="附加信息" v-model="input"></textarea>
     <br>
     <code>{{issue}}</code>
@@ -29,7 +32,7 @@ import { mapState, createNamespacedHelpers } from 'vuex'
 
 import { diff, makeIssue, submitDiff } from '@/worker'
 
-const { mapState: mapLoginState, mapMutations: mapLoginMutations, mapGetters } = createNamespacedHelpers('login')
+const { mapState: mapLoginState, mapMutations: mapLoginMutations, mapGetters: mapLoginGetters } = createNamespacedHelpers('login')
 
 export default {
   data() {
@@ -46,14 +49,22 @@ export default {
   },
   computed: {
     ...mapState(['diff']),
-    ...mapLoginState(['commit', 'username', 'token']),
-    ...mapGetters(['command']),
+    ...mapLoginState(['commit', 'username', 'token', 'title']),
+    ...mapLoginGetters(['command']),
     githubCommit: {
       get() {
         return this.username && this.commit
       },
       set(value) {
         this.setCommit(value)
+      }
+    },
+    commitTitle: {
+      get() {
+        return this.title
+      },
+      set(value) {
+        this.setTitle(value)
       }
     }
   },
@@ -73,7 +84,7 @@ export default {
     }
   },
   methods: {
-    ...mapLoginMutations(['setCommit']),
+    ...mapLoginMutations(['setCommit', 'setTitle']),
     async submit() {
       this.urlLoading = true
       const params = [this.input, this.command]

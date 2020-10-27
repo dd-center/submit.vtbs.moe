@@ -16,6 +16,7 @@ const login = {
     email: undefined,
     fail: false,
     extra: {},
+    title: '',
     commit: true
   },
   getters: {
@@ -30,16 +31,17 @@ const login = {
       return ''
     },
     command: state => {
+      const command = []
       if (state.commit && state.username) {
-        const command = [
-          ['name', state.name || state.username]
-        ]
+        command.push(['name', state.name || state.username])
         if (state.email) {
           command.push(['email', state.email])
         }
-        return command
       }
-      return []
+      if (state.title) {
+        command.push(['title', state.title])
+      }
+      return command
     }
   },
   mutations: {
@@ -61,6 +63,9 @@ const login = {
     },
     setExtra: (state, extra = {}) => {
       state.extra = extra
+    },
+    setTitle(state, title) {
+      state.title = title
     },
     setCommit: (state, newValue) => {
       state.commit = newValue
