@@ -15,7 +15,7 @@ const newFsJsonSearchMap = new Map()
 
 const encodeBase64 = string => Buffer.from(string).toString('base64')
 
-const fetchJson = async url => (await fetch(url)).json()
+const fetchJson = async url => (await fetch(url, { cache: 'no-cache' })).json()
 
 const updateNewFsJsonSearchMap = (files = Object.keys(newFs)) => [files].flat()
   .forEach(file => {
