@@ -176,13 +176,17 @@ export default {
     this.backup = JSON.stringify(editing)
     this.blank = JSON.stringify(editing)
 
-    return { editing, saving: false, saved: false, failed: false, rest: {}, groupList: [] }
+    return { editing, saving: false, saved: false, saveReset: true, failed: false, rest: {}, groupList: [] }
   },
   watch: {
     editing: {
       deep: true,
       handler() {
-        this.saved = false
+        if (this.saveReset) {
+          this.saved = false
+        } else {
+          this.saveReset = true
+        }
         this.failed = false
       }
     },
@@ -202,9 +206,10 @@ export default {
       async handler(file, oldFile) {
         if (file !== oldFile) {
           if (file) {
+            const { accounts = {}, name = {}, type, bot, group, ...rest } = await getVtbJson(file)
+            this.saveReset = false
+            this.editing = JSON.parse(this.blank)
             this.editing.fileName = file.replace('.json', '')
-            const json = await getVtbJson(file)
-            const { accounts = {}, name = {}, type, bot, group, ...rest } = json
 
             Object.entries(name)
               .flatMap(([lang, names]) => [names].flat().map(n => [lang, n]))
@@ -287,6 +292,9 @@ export default {
         this.saving = false
         this.saved = true
         await this.loadFileList()
+        if (this.file !== this.fileName) {
+          this.$router.push(`/edit/${this.fileName}`)
+        }
       } else {
         this.saving = false
         this.failed = true
