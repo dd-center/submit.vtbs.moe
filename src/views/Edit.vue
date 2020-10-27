@@ -145,6 +145,9 @@
         <div class="control">
           <router-link class="button is-light" tag="button" to="/">返回</router-link>
         </div>
+        <div class="control">
+          <button class="button is-danger" @click="remove" :disabled="!file">删除</button>
+        </div>
       </div>
     </div>
   </div>
@@ -281,6 +284,10 @@ export default {
       }
       this.msg.name = undefined
       return true
+    },
+    async remove() {
+      await deleteVtb(this.file)
+      this.$router.push('/')
     },
     async save() {
       this.saving = true
