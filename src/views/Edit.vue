@@ -11,7 +11,9 @@
       <div class="field has-addons">
         <div class="control"><input class="input" type="text" placeholder="文件名" v-model="editing.fileName"></div>
         <div class="control"><a class="button is-static">.json</a></div>
-        <div class="control"><p class="help warn is-danger" v-if="msg.filename">{{msg.filename}}</p></div>
+        <div class="control">
+          <p class="help warn is-danger" v-if="msg.filename">{{msg.filename}}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -37,7 +39,9 @@
     </div>
     <div class="field-body">
       <button class="button is-link" @click="addName">添加名字</button>
-      <div class="control"><p class="help warn is-danger" v-if="msg.name">{{msg.name}}</p></div>
+      <div class="control">
+        <p class="help warn is-danger" v-if="msg.name">{{msg.name}}</p>
+      </div>
     </div>
   </div>
 
@@ -77,7 +81,7 @@
 
   <hr>
 
-  <div class="field is-horizontal" v-for="({id, platform, type}, n) in editing.accounts" :key="`account_${n}`">
+  <div class="field is-horizontal" v-for="({id}, n) in editing.accounts" :key="`account_${n}`">
     <div class="field-label is-normal">
       <label class="label" v-if="!n">账号</label>
       <p v-if="!id || !urls[n].startsWith('http')" class="help url">{{urls[n]}}</p>
@@ -252,26 +256,25 @@ export default {
       this.editing.accounts.splice(n, 1)
     },
     checkFileName() {
-      this.msg['filename'] = '\\/:*"<>|'.split('').some(char => this.editing.fileName.includes(char)) ? "非法文件名" : undefined
-      return !this.msg['filename']
+      this.msg.filename = '\\/:*"<>|'.split('').some(char => this.editing.fileName.includes(char)) ? '非法文件名' : undefined
+      return !this.msg.filename
     },
     checkName() {
-      if (this.editing.names.length == 0) {
-        this.msg['name'] = "未填写名称"
+      if (this.editing.names.length === 0) {
+        this.msg.name = '未填写名称'
         return false
       }
-      
       for (const pair of this.editing.names) {
         if (!pair[0]) {
-          this.msg['name'] = "未填写语言"
+          this.msg.name = '未填写语言'
           return false
         }
         if (' ,:*\\/'.split('').some(char => pair[0].includes(char))) {
-          this.msg['name'] = "名称语言无效"
+          this.msg.name = '名称语言无效'
           return false
         }
       }
-      this.msg['name'] = undefined
+      this.msg.name = undefined
       return true
     },
     async save() {
@@ -288,7 +291,6 @@ export default {
         this.saving = false
         this.failed = true
       }
-      
     },
     reset() {
       this.editing = JSON.parse(this.backup)
