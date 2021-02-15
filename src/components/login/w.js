@@ -14,7 +14,7 @@ export const getGithubLoginUrl = () => {
 }
 
 export const getToken = async code => {
-  const response = await fetch('https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token', {
+  const response = await fetch('https://cors.bridged.cc/https://github.com/login/oauth/access_token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
