@@ -129,7 +129,7 @@ const generateLink = file => {
   return Object.entries(accounts)
     .map(([platform, ids]) => [linkSyntax[platform], ids])
     .map(w => w.flat())
-    .map(([platform, ...ids]) => [platform, ids.map(id => id.id || id)])
+    .map(([platform, ...ids]) => [platform, ...ids.map(id => id.id || id)])
     .flatMap(([linkFormat = '{id}', ...ids]) => ids.map(id => linkFormat.replace('{id}', id)))
 }
 
