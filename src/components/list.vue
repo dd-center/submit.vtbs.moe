@@ -39,22 +39,21 @@ export default {
       searching: false
     }
   },
-  created() {
+  async mounted() {
     this.observer = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
       if (isIntersecting) {
         const n = target.getAttribute('n')
         eventEmitter.emit(n)
         lastIntersectN = Number(n)
       }
-    }), { root: this.$refs.container, thresholds: [0], rootMargin: '80px 0px 20px 0px' })
+    }), { root: this.$refs.container, rootMargin: '80px 0px 20px 0px' })
     this.intersectionObserver = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
       if (isIntersecting) {
         const i = Number(target.getAttribute('i'))
         this.lastIntersect = i
       }
-    }), { root: this.$refs.container, thresholds: [0] })
-  },
-  async mounted() {
+    }), { root: this.$refs.container })
+
     await this.loadFileList()
     await this.$nextTick()
     const vtbs = document.getElementsByClassName('vtb')
