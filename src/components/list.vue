@@ -3,9 +3,8 @@
   <div class="control search" :class="{ 'is-loading' : searching}">
     <input class="input" type="text" placeholder="搜索" v-model="searchInput">
   </div>
-  <div class="indexContainer" :style="{ height: totalHeight + 'px' }">
+  <div class="indexContainer" :ref="'bigDetector'" :style="{ height: totalHeight + 'px' }">
     <vtb v-for="({i=0,file},n) in renderedList" :key="`vtb_${n}`" :i="i" :file="file" :n="n"></vtb>
-    <div class="detectors" v-for="({height,top,i,ref}) in detectors" :key="ref" :i="i" :ref="'detectors'" :style="{ height:`${height}px`, top:`${top}px` }"></div>
   </div>
   <template v-if="!displayFileList.length">
     <br>
@@ -21,19 +20,19 @@ import { searchList } from '@/worker'
 
 import vtb, { height, eventEmitter } from './list/vtb'
 
-const RENDER_LENGTH = 150
+const RENDER_LENGTH = 64
 
 let lastIntersectN = 0
+const threshold = Array(1000).fill().map((_, i) => i / 1000)
 
 export default {
   data() {
     return {
       height,
       renderTop: 0,
-      lastIntersect: 0,
       renderedList: Array(RENDER_LENGTH).fill({}),
       observer: undefined,
-      intersectionObserver: undefined,
+      bigObserver: undefined,
       searchInput: '',
       searchResult: undefined,
       searching: false
@@ -47,17 +46,15 @@ export default {
         lastIntersectN = Number(n)
       }
     }), { root: this.$refs.container, rootMargin: '80px 0px 20px 0px' })
-    this.intersectionObserver = new IntersectionObserver(entries => entries.forEach(({ isIntersecting, target }) => {
-      if (isIntersecting) {
-        const i = Number(target.getAttribute('i'))
-        this.lastIntersect = i
-      }
-    }), { root: this.$refs.container })
+    this.bigObserver = new IntersectionObserver(entries => entries.forEach((w) => {
+      this.renderTop = Math.round(Math.max(0, w.intersectionRatio * this.displayFileList.length - RENDER_LENGTH / 2))
+    }), { root: this.$refs.container, rootMargin: '9999999px 0px 0px 0px', threshold })
 
     await this.loadFileList()
     await this.$nextTick()
     const vtbs = document.getElementsByClassName('vtb')
     Array(vtbs.length).fill().map((_, i) => vtbs[i]).forEach(vtb => this.observer.observe(vtb))
+    this.bigObserver.observe(this.$refs.bigDetector)
   },
   methods: {
     render(start, length) {
@@ -91,12 +88,6 @@ export default {
     ...mapActions(['loadFileList'])
   },
   watch: {
-    async detectors(detectors, oldDetectors = []) {
-      await this.$nextTick()
-      if (this.$refs.detectors) {
-        this.$refs.detectors.forEach(detector => this.intersectionObserver.observe(detector))
-      }
-    },
     async searchInput(string) {
       this.search(string)
     },
@@ -127,15 +118,11 @@ export default {
         const length = end - newVal
         this.render(newVal, length)
       }
-    },
-    lastIntersect() {
-      const { lastIntersect } = this
-      this.renderTop = Math.max(0, lastIntersect - RENDER_LENGTH / 3)
     }
   },
   beforeDestroy() {
     this.observer.disconnect()
-    this.intersectionObserver.disconnect()
+    this.bigObserver.disconnect()
   },
   components: {
     vtb
@@ -147,11 +134,6 @@ export default {
     },
     totalHeight() {
       return this.displayFileList.length * this.height
-    },
-    detectors() {
-      const num = Math.round(this.displayFileList.length / RENDER_LENGTH * 3) + 1
-      const height = this.totalHeight / num
-      return Array(num).fill().map((_, i) => ({ ref: `detector_${i}`, height, top: i * height, i: Math.round(this.displayFileList.length / num * i) }))
     }
   }
 }
