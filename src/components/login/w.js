@@ -14,12 +14,8 @@ export const getGithubLoginUrl = () => {
 }
 
 export const getToken = async code => {
-  const response = await fetch('https://cors.bridged.cc/https://github.com/login/oauth/access_token', {
+  const response = await fetch('https://dd.center/api/proxy/access_token', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
     body: JSON.stringify({ code, client_secret: CLIENT_SECRET, client_id: CLIENT_ID })
   })
   const { access_token: token } = await response.json()
