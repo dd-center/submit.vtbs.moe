@@ -15,7 +15,7 @@
       以我的GitHub身份Commit <template v-if="!username">(请登陆)</template>
     </label>
     <hr>
-    <button class="button is-link is-light" :class="{ 'is-loading': urlLoading }" @click="submit" v-if="!url">发布</button>
+    <button class="button is-link is-light" :class="{ 'is-loading': urlLoading }" @click="submit" v-if="!url">发布</button><warning>请提交一次等待审核即可，不要重复提交，vtbs.moe数据并不是即时更新！</warning>
     <a :href="url" target="_blank" v-if="url">{{url}}</a>
   </template>
   <span v-if="diffLength === undefined">
@@ -109,5 +109,8 @@ code {
   display: block;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+warning {
+  color: red;
 }
 </style>
