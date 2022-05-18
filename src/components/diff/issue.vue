@@ -3,7 +3,7 @@
   <h1 class="title">发布</h1>
   <h2 class="subtitle">Issue</h2>
   <template v-if="diffLength && diffLength > 0">
-    <input class="input" type="text" placeholder="标题" v-model="commitTitle">
+    <input class="input" type="text" :placeholder="`标题: ${defaultTitle}`" v-model="inputTitle">
     <br>
     <br>
     <textarea class="textarea" placeholder="附加信息" v-model="input"></textarea>
@@ -44,7 +44,8 @@ export default {
       input: '',
       issue: '',
       url: undefined,
-      urlLoading: false
+      urlLoading: false,
+      inputTitle: ''
     }
   },
   async mounted() {
@@ -62,12 +63,14 @@ export default {
         this.setCommit(value)
       }
     },
-    commitTitle: {
-      get() {
-        return this.title
-      },
-      set(value) {
-        this.setTitle(value)
+    defaultTitle() {
+      if (this.diff.length) {
+        const vs = this.diff.map(([_, v]) => v)
+        const removes = vs.filter(v => v === 'remove').length
+        const adds = vs.filter(v => v === 'add').length
+        return `${this.diff[0][0]} (${vs.length}/-${removes}/+${adds})`
+      } else {
+        return 'update'
       }
     }
   },
@@ -83,6 +86,16 @@ export default {
       immediate: true,
       handler() {
         this.updateIssue()
+      }
+    },
+    inputTitle: {
+      immediate: true,
+      handler() {
+        if (this.inputTitle) {
+          this.setTitle(this.inputTitle)
+        } else {
+          this.setTitle(this.defaultTitle)
+        }
       }
     }
   },
