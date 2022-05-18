@@ -4,6 +4,7 @@
 
 ## Project setup
 ```
+git submodule update --init --recursive
 npm install
 ```
 
