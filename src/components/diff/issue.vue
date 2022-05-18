@@ -15,8 +15,11 @@
       以我的GitHub身份Commit <template v-if="!username">(请登陆)</template>
     </label>
     <hr>
-    <button class="button is-link is-light" :class="{ 'is-loading': urlLoading }" @click="submit" v-if="!url">发布</button><warning>请提交一次等待审核即可，不要重复提交，vtbs.moe数据并不是即时更新！</warning>
+    <button class="button is-link is-light" :class="{ 'is-loading': urlLoading }" @click="submit" v-if="!url">发布</button>
+    <br>
     <a :href="url" target="_blank" v-if="url">{{url}}</a>
+    <br>
+    <p class="warning">请提交一次等待审核即可，不要重复提交，vtbs.moe数据并不是即时更新！</p>
   </template>
   <span v-if="diffLength === undefined">
     loading...
@@ -110,7 +113,8 @@ code {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
-warning {
+
+.warning {
   color: red;
 }
 </style>
