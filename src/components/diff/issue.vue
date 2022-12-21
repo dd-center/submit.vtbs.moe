@@ -12,14 +12,14 @@
     <br>
     <label class="checkbox">
       <input type="checkbox" v-model="githubCommit" :disabled="!username">
-      以我的GitHub身份Commit <template v-if="!username">(请登陆)</template>
+      以我的GitHub身份Commit <template v-if="!username">(登陆后可收到审核反馈邮件)</template>
     </label>
     <hr>
     <button class="button is-link is-light" :class="{ 'is-loading': urlLoading }" @click="submit" v-if="!url">发布</button>
     <br>
     <a :href="url" target="_blank" v-if="url">{{url}}</a>
     <br>
-    <p class="warning">请提交一次等待审核即可，不要重复提交，vtbs.moe数据并不是即时更新！</p>
+    <p class="warning">提交一次即可，vtbs.moe的数据会在人工审核通过后更新！</p>
   </template>
   <span v-if="diffLength === undefined">
     loading...
