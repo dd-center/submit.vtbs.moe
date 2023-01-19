@@ -131,11 +131,13 @@ export default new Vuex.Store({
     async loadFileList({ commit, dispatch }) {
       const newList = await getList()
       commit('updateFileList', newList)
-      await Promise.all([dispatch('loadFs'), dispatch('loadIssues')])
+      await dispatch('loadDiff')
     },
     async loadFs({ commit }) {
+    async loadFs({ commit, dispatch }) {
       await loadFs()
       commit('updateMeta', await getMeta())
+      await dispatch('loadIssues')
       commit('loadedFs')
     },
     async loadDiff({ commit }) {
