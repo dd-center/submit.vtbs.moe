@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { getList, loadFs, getMeta, diff, loadWorkspaceList } from '@/worker'
+import { getList, loadFs, getMeta, diff, loadWorkspaceList, getIssues } from '@/worker'
 
 import { getUser, saveToken } from '@/components/login/w'
 
@@ -104,7 +104,8 @@ export default new Vuex.Store({
     fsLoaded: false,
     meta: {},
     diff: [],
-    workspaceList: []
+    workspaceList: [],
+    issues: {}
   },
   mutations: {
     loadedFs(state) {
@@ -121,13 +122,16 @@ export default new Vuex.Store({
     },
     updateWorkspaceList(state, list) {
       state.workspaceList = list
+    },
+    updateIssues(state, issues) {
+      state.issues = issues
     }
   },
   actions: {
     async loadFileList({ commit, dispatch }) {
       const newList = await getList()
       commit('updateFileList', newList)
-      await dispatch('loadDiff')
+      await Promise.all([dispatch('loadFs'), dispatch('loadIssues')])
     },
     async loadFs({ commit }) {
       await loadFs()
@@ -139,6 +143,9 @@ export default new Vuex.Store({
     },
     async loadWorkspaceList({ commit }) {
       commit('updateWorkspaceList', await loadWorkspaceList())
+    },
+    async loadIssues({ commit }) {
+      commit('updateIssues', await getIssues())
     }
   },
   modules: { login }

@@ -9,6 +9,7 @@ const workspace = new Level('submit.vtbs.moe-workspace')
 
 let list
 let fs
+let issues = []
 let newFs
 
 const encodeBase64 = string => Buffer.from(string).toString('base64')
@@ -21,6 +22,7 @@ export const loadFs = warp(async () => {
     newFs = JSON.parse(JSON.stringify(fs))
   }
   list = await fetchJson('https://vdb.vtbs.moe/json/list.json')
+  issues = await fetchJson('https://vdb.vtbs.moe/json/fs-review.json')
 })
 
 export const loadWorkspaceList = warp(async () => {
@@ -42,6 +44,8 @@ export const loadWorkspace = warp(async name => {
 export const deleteWorkspace = warp(async name => {
   await workspace.del(name)
 })
+
+export const getIssues = warp(() => issues)
 
 export const getMeta = warp(() => list.meta)
 

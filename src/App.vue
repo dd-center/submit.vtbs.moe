@@ -36,6 +36,11 @@
                   <a :href="href" @click="navigate" class="aLink">工作区存档({{workspaceList.length}})</a>
                 </li>
               </router-link>
+              <router-link to="/issue" custom v-slot="{ navigate, href, isExactActive }">
+                <li class="link" :class="{active: isExactActive}">
+                  <a :href="href" @click="navigate" class="aLink">issue ({{Object.keys(issues).length}})</a>
+                </li>
+              </router-link>
               <router-link to="/login" custom v-slot="{ navigate, href, isExactActive }">
                 <li class="link" :class="{active: isExactActive}">
                   <a :href="href" @click="navigate" class="aLink">登录{{currentState}}</a>
@@ -84,7 +89,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['fsLoaded', 'workspaceList', 'diff']),
+    ...mapState(['fsLoaded', 'workspaceList', 'diff', 'issues']),
     ...mapLoginGetters(['currentState'])
   },
   methods: {
