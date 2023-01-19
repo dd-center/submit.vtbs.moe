@@ -10,25 +10,15 @@ const workspace = new Level('submit.vtbs.moe-workspace')
 let list
 let fs
 let newFs
-let newFsLowerCaseFileMap
-const newFsJsonSearchMap = new Map()
 
 const encodeBase64 = string => Buffer.from(string).toString('base64')
 
 const fetchJson = async url => (await fetch(url, { cache: 'no-cache' })).json()
 
-const updateNewFsJsonSearchMap = (files = Object.keys(newFs)) => [files].flat()
-  .forEach(file => {
-    newFsJsonSearchMap.set(file, `${file}${JSON.stringify(newFs[file])}`.toLowerCase())
-  })
-
 export const loadFs = warp(async () => {
   fs = await fetchJson('https://vdb.vtbs.moe/json/fs.json')
   if (!newFs) {
     newFs = JSON.parse(JSON.stringify(fs))
-    newFsLowerCaseFileMap = Object.fromEntries(Object.keys(newFs)
-      .map(file => [file.toLowerCase(), file]))
-    updateNewFsJsonSearchMap()
   }
   list = await fetchJson('https://vdb.vtbs.moe/json/list.json')
 })
@@ -47,9 +37,6 @@ export const saveWorkspace = warp(async name => {
 
 export const loadWorkspace = warp(async name => {
   newFs = JSON.parse(await workspace.get(name))
-  newFsLowerCaseFileMap = Object.fromEntries(Object.keys(newFs)
-    .map(file => [file.toLowerCase(), file]))
-  updateNewFsJsonSearchMap()
 })
 
 export const deleteWorkspace = warp(async name => {
@@ -67,28 +54,29 @@ export const getGroupList = warp(() => Object.entries(newFs)
   .filter(({ type }) => type === 'group')
   .map(({ file }) => file.replace('.json', '')))
 
-export const searchList = warp(keys => getList()
-  .map(file => [file, newFsJsonSearchMap.get(file)])
-  .filter(([_, content]) => keys.every(key => content.includes(key)))
-  .map(([file]) => file))
+export const searchList = warp(keys => Object.entries(newFs)
+  .map(([file, content]) => [file.toLowerCase(), JSON.stringify(content).toLowerCase(), file])
+  .filter(([k, content]) => keys.every(key => k.includes(key) || content.includes(key)))
+  .map(([_, __, file]) => file))
 
-export const getVtbJson = warp(name => newFs[name])
+export const getVtbJson = warp(name => {
+  if (!newFs[name]) {
+    console.log(name)
+  }
+  return newFs[name]
+})
 
 export const deleteVtb = warp(file => {
   delete newFs[file]
-  delete newFsLowerCaseFileMap[file.toLowerCase()]
-  newFsJsonSearchMap.delete(file)
 })
 
 export const saveVtb = warp((file, data) => {
   const fileLowerCase = file.toLowerCase()
-  const currentFile = newFsLowerCaseFileMap[fileLowerCase]
+  const currentFile = Object.keys(newFs).find(file => file.toLowerCase() === fileLowerCase)
   if (currentFile) {
     deleteVtb(currentFile)
   }
   newFs[file] = data
-  newFsLowerCaseFileMap[fileLowerCase] = file
-  updateNewFsJsonSearchMap(file)
 })
 
 export const resetVtb = warp(file => {
