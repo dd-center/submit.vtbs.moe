@@ -14,7 +14,11 @@
     <div class="is-divider-vertical"></div>
     <div class="column">
       <div class="buttons">
-        <router-link tag="button" class="button is-info is-small" :to="`edit/${file}`">编辑</router-link>
+        <router-link :to="`edit/${file}`" custom v-slot="{ navigate }">
+          <button @click="navigate" class="button is-info is-small">
+            编辑
+          </button>
+        </router-link>
         <button class="button is-danger is-small" @click="remove">删除</button>
       </div>
     </div>

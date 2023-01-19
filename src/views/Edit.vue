@@ -143,7 +143,11 @@
           <button class="button is-link is-light" @click="reset">复原</button>
         </div>
         <div class="control">
-          <router-link class="button is-light" tag="button" to="/">返回</router-link>
+          <router-link to="/" custom v-slot="{ navigate }">
+            <button class="button is-light" @click="navigate">
+              返回
+            </button>
+          </router-link>
         </div>
         <div class="control">
           <button class="button is-danger" @click="remove" :disabled="!file">删除</button>

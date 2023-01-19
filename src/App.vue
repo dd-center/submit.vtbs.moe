@@ -16,11 +16,31 @@
         <nav class="tabs" v-if="fsLoaded">
           <div class="container">
             <ul>
-              <router-link tag="li" to="/" class="link"><a class="aLink">Panel</a></router-link>
-              <router-link tag="li" to="/edit" class="link"><a class="aLink">新建</a></router-link>
-              <router-link tag="li" to="/submit" class="link"><a class="aLink">提交!({{diff.length}})</a></router-link>
-              <router-link tag="li" to="/workspace" class="link"><a class="aLink">工作区存档({{workspaceList.length}})</a></router-link>
-              <router-link tag="li" to="/login" class="link"><a class="aLink">登录{{currentState}}</a></router-link>
+              <router-link to="/" custom v-slot="{ navigate, href, isExactActive }">
+                <li class="link" :class="{active: isExactActive}">
+                  <a :href="href" @click="navigate" class="aLink">Panel</a>
+                </li>
+              </router-link>
+              <router-link to="/edit" custom v-slot="{ navigate, href, isExactActive }">
+                <li class="link" :class="{active: isExactActive}">
+                  <a :href="href" @click="navigate" class="aLink">新建</a>
+                </li>
+              </router-link>
+              <router-link to="/submit" custom v-slot="{ navigate, href, isExactActive }">
+                <li class="link" :class="{active: isExactActive}">
+                  <a :href="href" @click="navigate" class="aLink">提交!({{diff.length}})</a>
+                </li>
+              </router-link>
+              <router-link to="/workspace" custom v-slot="{ navigate, href, isExactActive }">
+                <li class="link" :class="{active: isExactActive}">
+                  <a :href="href" @click="navigate" class="aLink">工作区存档({{workspaceList.length}})</a>
+                </li>
+              </router-link>
+              <router-link to="/login" custom v-slot="{ navigate, href, isExactActive }">
+                <li class="link" :class="{active: isExactActive}">
+                  <a :href="href" @click="navigate" class="aLink">登录{{currentState}}</a>
+                </li>
+              </router-link>
             </ul>
           </div>
         </nav>
@@ -99,7 +119,7 @@ export default {
   margin-bottom: 4px;
 }
 
-.router-link-exact-active {
+.active {
   border-color: rgba(0, 0, 0, 0.2);
 }
 
