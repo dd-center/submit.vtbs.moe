@@ -8,7 +8,7 @@
     "lint": "NODE_OPTIONS=--openssl-legacy-provider vue-cli-service lint"
   },
   "dependencies": {
-    "bulma": "^0.8.1",
+    "bulma": "^0.9.4",
     "bulma-divider": "^0.2.0",
     "core-js": "^3.6.4",
     "level": "^8.0.0",
