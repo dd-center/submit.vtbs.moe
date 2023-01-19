@@ -142,20 +142,21 @@ const describeDiff = () => {
     .join('\n')
 }
 
+const diffCommand = () => diff()
+  .map(([file, status]) => {
+    switch (status) {
+      case 'remove':
+        return ['delete', file]
+      case 'add':
+      case 'update':
+        return ['put', file, JSON.stringify(getVtbJson(file), undefined, 2)]
+      default:
+    }
+  })
+  .filter(Boolean)
+
 export const serializeDiff = warp((extraCommands = []) => {
-  const change = diff()
-  const command = change
-    .map(([file, status]) => {
-      switch (status) {
-        case 'remove':
-          return ['delete', file]
-        case 'add':
-        case 'update':
-          return ['put', file, JSON.stringify(getVtbJson(file), undefined, 2)]
-        default:
-      }
-    })
-    .filter(Boolean)
+  const command = diffCommand()
   if (!command.length) {
     return []
   }
