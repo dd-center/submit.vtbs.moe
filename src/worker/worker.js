@@ -1,11 +1,11 @@
-import level from 'level'
+import { Level } from 'level'
 
 import { warp } from './warp'
 
 import vdbParse from '../vdb/parse'
 import vdbTest from '../vdb/test'
 
-const workspace = level('submit.vtbs.moe-workspace')
+const workspace = new Level('submit.vtbs.moe-workspace')
 
 let list
 let fs
@@ -33,16 +33,13 @@ export const loadFs = warp(async () => {
   list = await fetchJson('https://vdb.vtbs.moe/json/list.json')
 })
 
-export const loadWorkspaceList = warp(() => new Promise(resolve => {
+export const loadWorkspaceList = warp(async () => {
   const list = []
-  workspace.createKeyStream()
-    .on('data', (key) => {
-      list.push(key)
-    })
-    .on('end', () => {
-      resolve(list)
-    })
-}))
+  for await (const key of workspace.keys()) {
+    list.push(key)
+  }
+  return list
+})
 
 export const saveWorkspace = warp(async name => {
   await workspace.put(name, JSON.stringify(newFs))
