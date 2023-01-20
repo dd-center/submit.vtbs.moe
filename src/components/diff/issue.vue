@@ -64,14 +64,17 @@ export default {
       }
     },
     defaultTitle() {
+      let title = ''
       if (this.diff.length) {
         const vs = this.diff.map(([_, v]) => v)
         const removes = vs.filter(v => v === 'remove').length
         const adds = vs.filter(v => v === 'add').length
-        return `${this.diff[0][0]} (${vs.length}/-${removes}/+${adds})${this.issuesApply.length ? ` Merge ${this.issuesApply.length}` : ''}}`
-      } else {
-        return 'update'
+        title += `${this.diff[0][0]} (${vs.length}/-${removes}/+${adds})`
       }
+      if (this.issuesApply.length) {
+        title += `Merge ${this.issuesApply.length}`
+      }
+      return title || 'update'
     }
   },
   watch: {
