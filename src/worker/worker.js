@@ -122,34 +122,42 @@ export const saveVtb = warp((file, data) => {
   newFs[file] = data
 })
 
-export const resetVtb = warp(file => {
-  if (applyIssues()[file]) {
-    saveVtb(file, JSON.parse(JSON.stringify(applyIssues()[file])))
+export const resetVtb = warp((file, issue) => {
+  const base = issue ? fs : applyIssues()
+  if (base[file]) {
+    saveVtb(file, JSON.parse(JSON.stringify(base[file])))
   } else {
     deleteVtb(file)
   }
 })
 
-const parse = () => vdbParse({ ...list.meta, vtbs: Object.entries(newFs).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) }, true)
+const parse = fsUsed => vdbParse({ ...list.meta, vtbs: Object.entries(fsUsed).map(([name, object]) => [name.replace('.json', ''), object]).map(([name, object]) => ({ name, object })) }, true)
 
-export const test = warp(() => vdbTest(parse(), Object.keys(newFs)))
+export const test = warp(issue => {
+  const fsUsed = issue ? apply(JSON.parse(JSON.stringify(fs)), issues[issue].commands) : newFs
+  return vdbTest(parse(fsUsed), Object.keys(fsUsed))
+})
 
-const diffFile = file => {
-  if (!newFs[file]) {
+const diffFile = (file, from, to) => {
+  if (!to[file]) {
     return 'remove'
   }
-  if (!applyIssues()[file]) {
+  if (!from[file]) {
     return 'add'
   }
-  if (JSON.stringify(applyIssues()[file]) !== JSON.stringify(newFs[file])) {
+  if (JSON.stringify(from[file]) !== JSON.stringify(to[file])) {
     return 'update'
   }
   return undefined
 }
 
-export const diff = warp(() => [...new Set([...Object.keys(applyIssues()), ...Object.keys(newFs)])]
-  .map(file => [file, diffFile(file)])
-  .filter(([_, status]) => status))
+export const diff = warp(issue => {
+  const base = issue ? fs : applyIssues()
+  const fsUsed = issue ? apply(JSON.parse(JSON.stringify(fs)), issues[issue].commands) : newFs
+  return [...new Set([...Object.keys(base), ...Object.keys(fsUsed)])]
+    .map(file => [file, diffFile(file, base, fsUsed)])
+    .filter(([_, status]) => status)
+})
 
 const generateLink = file => {
   const { accounts = {} } = newFs[file]
@@ -205,7 +213,10 @@ const diffCommand = () => diff()
   })
   .filter(Boolean)
 
-export const serializeDiff = warp((extraCommands = []) => {
+export const serializeDiff = warp((extraCommands = [], issue) => {
+  if (issue) {
+    return issues[issue].commands.map(([cmd, file, content]) => [cmd, file, content, fs[file] && JSON.stringify(fs[file], undefined, 2)])
+  }
   const merge = issuesApply.map(file => issues[file].issue.number).map(number => ['merge', number])
   const command = [...merge, ...diffCommand()]
   if (!command.length) {

@@ -9,13 +9,15 @@
           <th>Command</th>
           <th>File</th>
           <th>content</th>
+          <th v-if="issue">before</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="[cmd, file, content = ''] in code" :key="`s_${file}`">
+        <tr v-for="[cmd, file, content = '', before = ''] in code" :key="`s_${file}`">
           <td>{{cmd}}</td>
           <td>{{file}}</td>
-          <td><code v-if="!!content">{{content}}</code></td>
+          <td><code v-if="!!content" :class="{ green: issue }">{{content}}</code></td>
+          <td v-if="issue"><code v-if="before" class="red">{{before}}</code></td>
         </tr>
       </tbody>
     </table>
@@ -24,13 +26,10 @@
 </template>
 
 <script>
-import { mapState, createNamespacedHelpers } from 'vuex'
-
 import { serializeDiff } from '@/worker'
 
-const { mapGetters } = createNamespacedHelpers('login')
-
 export default {
+  props: ['diff', 'command', 'issue'],
   data() {
     return {
       code: [
@@ -40,18 +39,14 @@ export default {
   },
   watch: {
     async command() {
-      this.code = await serializeDiff(this.command)
+      this.code = await serializeDiff(this.command, this.issue)
     },
     diff: {
       immediate: true,
       async handler() {
-        this.code = await serializeDiff(this.command)
+        this.code = await serializeDiff(this.command, this.issue)
       }
     }
-  },
-  computed: {
-    ...mapState(['diff']),
-    ...mapGetters(['command'])
   }
 }
 </script>
@@ -61,5 +56,13 @@ code {
   display: block;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+code.red {
+  color: #f14668;
+}
+
+code.green {
+  color: rgb(30, 174, 80);
 }
 </style>

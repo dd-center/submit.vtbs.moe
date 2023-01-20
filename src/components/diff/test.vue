@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 
 import { test } from '@/worker'
 
@@ -24,15 +23,15 @@ export default {
   watch: {
     async diff() {
       this.loading = true
-      this.errors = await test()
+      this.errors = await test(this.issue)
       this.loading = false
     }
   },
   async mounted() {
-    this.errors = await test()
+    this.errors = await test(this.issue)
     this.loading = false
   },
-  computed: mapState(['diff'])
+  props: ['diff', 'issue']
 }
 </script>
 

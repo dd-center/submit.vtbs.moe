@@ -6,6 +6,7 @@ import Edit from '../views/Edit.vue'
 import Workspace from '../views/Workspace.vue'
 import Login from '../views/Login.vue'
 import Issues from '../views/Issues.vue'
+import Issue from '../views/Issue.vue'
 
 Vue.use(VueRouter)
 
@@ -28,6 +29,10 @@ const routes = [{
 }, {
   path: '/issue',
   component: Issues
+}, {
+  path: '/issue/:id',
+  component: Issue,
+  props: true
 }, {
   path: '/login',
   component: Login,

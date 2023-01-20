@@ -2,7 +2,7 @@
 <div class="container">
   <div class="flex-container">
     <router-link :to="`/issue/${issue.key}`" custom v-slot="{ navigate }" v-for="issue of issueCompute" :key="issue.key">
-      <div class="boxx">
+      <div class="boxx" @click="navigate">
         <h1 class="title">{{issue.title}}</h1>
         <h2 class="subtitle">{{issue.key}}</h2>
         <button class="delete is-large" v-if="issue.apply" @click.prevent="unapplyIssue(issue.key)"></button>
