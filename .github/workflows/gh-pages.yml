@@ -7,14 +7,14 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
 
     - name: Use Node.js 18
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: 18
 
