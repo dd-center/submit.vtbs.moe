@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { getList, loadFs, getMeta, diff, loadWorkspaceList, getIssues } from '@/worker'
+import { getList, loadFs, getMeta, diff, loadWorkspaceList, getIssues, getIssuesApply, applyIssue, unapplyIssue } from '@/worker'
 
 import { getUser, saveToken } from '@/components/login/w'
 
@@ -105,7 +105,8 @@ export default new Vuex.Store({
     meta: {},
     diff: [],
     workspaceList: [],
-    issues: {}
+    issues: {},
+    issuesApply: []
   },
   mutations: {
     loadedFs(state) {
@@ -125,6 +126,9 @@ export default new Vuex.Store({
     },
     updateIssues(state, issues) {
       state.issues = issues
+    },
+    updateIssuesApply(state, issuesApply) {
+      state.issuesApply = issuesApply
     }
   },
   actions: {
@@ -133,7 +137,6 @@ export default new Vuex.Store({
       commit('updateFileList', newList)
       await dispatch('loadDiff')
     },
-    async loadFs({ commit }) {
     async loadFs({ commit, dispatch }) {
       await loadFs()
       commit('updateMeta', await getMeta())
@@ -148,6 +151,17 @@ export default new Vuex.Store({
     },
     async loadIssues({ commit }) {
       commit('updateIssues', await getIssues())
+      commit('updateIssuesApply', await getIssuesApply())
+    },
+    async applyIssue({ dispatch }, issue) {
+      await applyIssue(issue)
+      await dispatch('loadIssues')
+      await dispatch('loadDiff')
+    },
+    async unapplyIssue({ dispatch }, issue) {
+      await unapplyIssue(issue)
+      await dispatch('loadIssues')
+      await dispatch('loadDiff')
     }
   },
   modules: { login }

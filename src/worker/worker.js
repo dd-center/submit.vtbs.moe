@@ -9,8 +9,11 @@ const workspace = new Level('submit.vtbs.moe-workspace')
 
 let list
 let fs
-let issues = []
+let issues = {}
+let issuesApply = []
 let newFs
+
+const issuesApplyCacheFS = new WeakMap()
 
 const encodeBase64 = string => Buffer.from(string).toString('base64')
 
@@ -47,6 +50,47 @@ export const deleteWorkspace = warp(async name => {
 
 export const getIssues = warp(() => issues)
 
+export const getIssuesApply = warp(() => issuesApply)
+
+const apply = (fs, commands) => commands
+  .reduce((fs, [command, arg, content]) => {
+    if (command === 'delete') {
+      const {
+        [arg]: _, ...rest
+      } = fs
+      return rest
+    } else if (command === 'put') {
+      return {
+        ...fs,
+        [arg]: JSON.parse(content)
+      }
+    }
+    return fs
+  }, fs)
+
+const applyIssues = () => {
+  if (!issuesApplyCacheFS.has(issuesApply)) {
+    const result = apply(JSON.parse(JSON.stringify(fs)), issuesApply
+      .map(file => issues[file])
+      .flatMap(({ commands }) => commands))
+    issuesApplyCacheFS.set(issuesApply, result)
+  }
+  return issuesApplyCacheFS.get(issuesApply)
+}
+
+export const applyIssue = warp(file => {
+  if (!issuesApply.includes(file)) {
+    issuesApply = [...issuesApply, file]
+    newFs = apply(newFs, issues[file].commands)
+  }
+})
+
+export const unapplyIssue = warp(file => {
+  const currentCommand = diffCommand()
+  issuesApply = issuesApply.filter(f => f !== file)
+  newFs = apply(applyIssues(), currentCommand)
+})
+
 export const getMeta = warp(() => list.meta)
 
 export const getFs = warp(() => newFs)
@@ -63,12 +107,7 @@ export const searchList = warp(keys => Object.entries(newFs)
   .filter(([k, content]) => keys.every(key => k.includes(key) || content.includes(key)))
   .map(([_, __, file]) => file))
 
-export const getVtbJson = warp(name => {
-  if (!newFs[name]) {
-    console.log(name)
-  }
-  return newFs[name]
-})
+export const getVtbJson = warp(name => newFs[name])
 
 export const deleteVtb = warp(file => {
   delete newFs[file]
@@ -84,8 +123,8 @@ export const saveVtb = warp((file, data) => {
 })
 
 export const resetVtb = warp(file => {
-  if (fs[file]) {
-    saveVtb(file, JSON.parse(JSON.stringify(fs[file])))
+  if (applyIssues()[file]) {
+    saveVtb(file, JSON.parse(JSON.stringify(applyIssues()[file])))
   } else {
     deleteVtb(file)
   }
@@ -99,16 +138,16 @@ const diffFile = file => {
   if (!newFs[file]) {
     return 'remove'
   }
-  if (!fs[file]) {
+  if (!applyIssues()[file]) {
     return 'add'
   }
-  if (JSON.stringify(fs[file]) !== JSON.stringify(newFs[file])) {
+  if (JSON.stringify(applyIssues()[file]) !== JSON.stringify(newFs[file])) {
     return 'update'
   }
   return undefined
 }
 
-export const diff = warp(() => [...new Set([...Object.keys(fs), ...Object.keys(newFs)])]
+export const diff = warp(() => [...new Set([...Object.keys(applyIssues()), ...Object.keys(newFs)])]
   .map(file => [file, diffFile(file)])
   .filter(([_, status]) => status))
 
@@ -142,6 +181,17 @@ const describeDiff = () => {
     .join('\n')
 }
 
+const describeMerge = () => {
+  const merge = issuesApply
+    .map(file => issues[file].issue.number)
+    .map(number => `#${number}`)
+  if (!merge.length) {
+    return ''
+  }
+  return `
+Merge: ${merge.join(' ')}`
+}
+
 const diffCommand = () => diff()
   .map(([file, status]) => {
     switch (status) {
@@ -156,7 +206,8 @@ const diffCommand = () => diff()
   .filter(Boolean)
 
 export const serializeDiff = warp((extraCommands = []) => {
-  const command = diffCommand()
+  const merge = issuesApply.map(file => issues[file].issue.number).map(number => ['merge', number])
+  const command = [...merge, ...diffCommand()]
   if (!command.length) {
     return []
   }
@@ -180,11 +231,12 @@ const encodeDiff = extraCommands => {
 export const makeIssue = warp((input, extraCommands) => {
   const command = encodeDiff(extraCommands)
   const description = describeDiff()
+  const merge = describeMerge()
 
   return `${input}
 
 ### description
-
+${merge}
 ${description}
 
 \`\`\`

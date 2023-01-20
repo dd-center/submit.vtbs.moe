@@ -28,7 +28,7 @@
               </router-link>
               <router-link to="/submit" custom v-slot="{ navigate, href, isExactActive }">
                 <li class="link" :class="{active: isExactActive}">
-                  <a :href="href" @click="navigate" class="aLink">提交!({{diff.length}})</a>
+                  <a :href="href" @click="navigate" class="aLink">提交!({{diff.length + issuesApply.length}})</a>
                 </li>
               </router-link>
               <router-link to="/workspace" custom v-slot="{ navigate, href, isExactActive }">
@@ -38,7 +38,7 @@
               </router-link>
               <router-link to="/issue" custom v-slot="{ navigate, href, isExactActive }">
                 <li class="link" :class="{active: isExactActive}">
-                  <a :href="href" @click="navigate" class="aLink">issue ({{Object.keys(issues).length}})</a>
+                  <a :href="href" @click="navigate" class="aLink">issue ({{issuesApply.length}}/{{Object.keys(issues).length}})</a>
                 </li>
               </router-link>
               <router-link to="/login" custom v-slot="{ navigate, href, isExactActive }">
@@ -89,7 +89,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['fsLoaded', 'workspaceList', 'diff', 'issues']),
+    ...mapState(['fsLoaded', 'workspaceList', 'diff', 'issues', 'issuesApply']),
     ...mapLoginGetters(['currentState'])
   },
   methods: {

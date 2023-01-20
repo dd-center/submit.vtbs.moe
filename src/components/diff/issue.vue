@@ -33,7 +33,7 @@
 <script>
 import { mapState, createNamespacedHelpers } from 'vuex'
 
-import { diff, makeIssue, submitDiff } from '@/worker'
+import { diff, makeIssue, submitDiff, getIssuesApply } from '@/worker'
 
 const { mapState: mapLoginState, mapMutations: mapLoginMutations, mapGetters: mapLoginGetters } = createNamespacedHelpers('login')
 
@@ -49,7 +49,7 @@ export default {
     }
   },
   async mounted() {
-    this.diffLength = (await diff()).length
+    this.diffLength = (await diff()).length + (await getIssuesApply()).length
   },
   computed: {
     ...mapState(['diff']),
@@ -76,7 +76,7 @@ export default {
   },
   watch: {
     async diff() {
-      this.diffLength = (await diff()).length
+      this.diffLength = (await diff()).length + (await getIssuesApply()).length
       await this.updateIssue()
     },
     command() {
