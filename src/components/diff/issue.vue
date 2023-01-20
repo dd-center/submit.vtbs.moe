@@ -52,7 +52,7 @@ export default {
     this.diffLength = (await diff()).length + (await getIssuesApply()).length
   },
   computed: {
-    ...mapState(['diff']),
+    ...mapState(['diff', 'issuesApply']),
     ...mapLoginState(['commit', 'username', 'token', 'title']),
     ...mapLoginGetters(['command']),
     githubCommit: {
@@ -68,7 +68,7 @@ export default {
         const vs = this.diff.map(([_, v]) => v)
         const removes = vs.filter(v => v === 'remove').length
         const adds = vs.filter(v => v === 'add').length
-        return `${this.diff[0][0]} (${vs.length}/-${removes}/+${adds})`
+        return `${this.diff[0][0]} (${vs.length}/-${removes}/+${adds})${this.issuesApply.length ? ` Merge ${this.issuesApply.length}` : ''}}`
       } else {
         return 'update'
       }
