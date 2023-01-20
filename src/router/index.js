@@ -5,7 +5,7 @@ import Submit from '../views/Submit.vue'
 import Edit from '../views/Edit.vue'
 import Workspace from '../views/Workspace.vue'
 import Login from '../views/Login.vue'
-import Issue from '../views/Issue.vue'
+import Issues from '../views/Issues.vue'
 
 Vue.use(VueRouter)
 
@@ -27,7 +27,7 @@ const routes = [{
   component: Workspace
 }, {
   path: '/issue',
-  component: Issue
+  component: Issues
 }, {
   path: '/login',
   component: Login,
