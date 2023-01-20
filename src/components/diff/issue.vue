@@ -72,6 +72,9 @@ export default {
         title += `${this.diff[0][0]} (${vs.length}/-${removes}/+${adds})`
       }
       if (this.issuesApply.length) {
+        if (title) {
+          title += ', '
+        }
         title += `Merge ${this.issuesApply.length}`
       }
       return title || 'update'
