@@ -199,8 +199,6 @@ export const submitDiff = warp(async (input, extraCommands, token) => {
 
   const Authorization = token ? `token ${token}` : 'Basic ZGQtY2VudGVyLWJvdDpkZDBiMmY0MjE4OThmNjAzZGYwNGM0NzdkMzQyNmU5MzE4MWRlZTUy'
 
-  console.log({ Authorization })
-
   const response = await fetch('https://api.github.com/repos/dd-center/vdb/issues', {
     method: 'POST',
     headers: {
