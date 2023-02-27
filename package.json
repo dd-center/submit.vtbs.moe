@@ -10,7 +10,7 @@
   "dependencies": {
     "bulma": "^0.9.4",
     "bulma-divider": "^0.2.0",
-    "core-js": "^3.6.4",
+    "core-js": "^3.29.0",
     "level": "^8.0.0",
     "uuid": "^9.0.0",
     "vdb": "file:src/vdb",
