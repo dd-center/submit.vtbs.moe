@@ -10,6 +10,7 @@
           <h2 class="subtitle">
             你好呀
           </h2>
+          如何正确提交：<a href="https://docs.vtbs.top" target="_blank" rel="noopener noreferrer">https://docs.vtbs.top</a><br>
         </div>
       </div>
       <div class="hero-foot">
