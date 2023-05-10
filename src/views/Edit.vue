@@ -115,22 +115,6 @@
 
   <div class="field is-horizontal">
     <div class="field-label is-normal">
-      <label class="label">所属社团</label>
-      <p class="help">这里写所属社团记录的文件名<br>(不需要文件后缀)</p>
-      <p class="help">无所属留空</p>
-    </div>
-    <div class="field-body">
-      <div class="field">
-        <div class="control"><input class="input" type="text" placeholder="社团" v-model="editing.group"></div>
-        <button class="button is-text" v-for="group in groupAuto" :key="`groupAuto_${group}`" @click="editing.group = group">{{group}}</button>
-      </div>
-    </div>
-  </div>
-
-  <hr>
-
-  <div class="field is-horizontal">
-    <div class="field-label is-normal">
       <p class="help" v-if="saved">保存成功!</p>
       <p class="help is-danger" v-if="failed">格式错误，请检查上面的输入!</p>
     </div>
@@ -158,6 +142,21 @@
 
   <hr>
 
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">所属社团</label>
+      <p class="help">这里写所属社团记录的文件名<br>(不需要文件后缀)</p>
+      <p class="help">无所属留空</p>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control"><input class="input" type="text" placeholder="社团" v-model="editing.group"></div>
+        <button class="button is-text" v-for="group in groupAuto" :key="`groupAuto_${group}`" @click="editing.group = group">{{group}}</button>
+      </div>
+    </div>
+  </div>
+
+  <hr>
   <code>{{code}}</code>
   <br>
 </div>
