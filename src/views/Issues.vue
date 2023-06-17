@@ -6,7 +6,7 @@
         <h1 class="title">{{issue.title}}</h1>
         <h2 class="subtitle">{{issue.key}}</h2>
         <button class="delete is-large" v-if="issue.apply" @click.prevent="unapplyIssue(issue.key)"></button>
-        <button class="button is-success" v-else @click.prevent="applyIssue(issue.key)">Apply</button>
+        <button class="button is-success" v-else @click.prevent="applyIssue(issue.key)">Load</button>
       </div>
     </router-link>
   </div>

@@ -4,7 +4,7 @@
     <h1 class="title">{{title}}</h1>
     <p>
       <button class="delete is-large" v-if="apply" @click.prevent="unapplyIssue(id)"></button>
-      <button class="button is-success" v-else @click.prevent="applyIssue(id)">Apply</button>
+      <button class="button is-success" v-else @click.prevent="applyIssue(id)">Load</button>
       <br>
       issue <a :href="issueLink" target="_blank" rel="noopener noreferrer">{{ issueLink }}</a>
       <br>
